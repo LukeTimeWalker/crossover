@@ -1,4 +1,5 @@
-# Crossover
+![Crossover Logo](./assets/header_dark.svg#gh-dark-mode-only)
+![Crossover Logo](./assets/header_light.svg#gh-light-mode-only)
 
 Crossover is a declarative webhook translator written in Go. So basically it receives HTTP-Requests on preconfigured endpoints and sends out HTTP-Request to other endpoints based on conditions
 
