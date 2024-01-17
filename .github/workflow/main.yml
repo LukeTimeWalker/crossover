@@ -5,7 +5,7 @@ on:
       - main
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     name: Build
     steps:
       - name: Check out the codebase.
@@ -15,4 +15,4 @@ jobs:
         with:
           go-version: '1.21'
       - name: Build
-        run: go build -v ./...
+        run: go build -o crossover
