@@ -1,0 +1,23 @@
+name: Dev Pipeline
+on:
+  push:
+    branches:
+      - '**'
+      - '!main'
+jobs:
+  build:
+    name: Build
+    runs-on: self-hosted
+    steps:
+      - name: Checkout the Codebase.
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: 'go.mod'
+      - name: Install Dependencies
+        run: go get .
+      - name: Running Tests
+        run: go test ./...
+      - name: Build
+        run: go build
