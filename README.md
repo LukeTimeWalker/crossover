@@ -1,21 +1,25 @@
 ![Crossover Logo](./assets/header_dark.svg#gh-dark-mode-only)
 ![Crossover Logo](./assets/header_light.svg#gh-light-mode-only)
 
-Crossover is a declarative webhook translator written in Go. So basically it receives HTTP-Requests on preconfigured endpoints and sends out HTTP-Request to other endpoints based on conditions
+Crossover is a lightweight and declarative webhook translator written in Go. So basically it receives HTTP-Requests on pre-configured endpoints and sends out HTTP-Request to different also configurable endpoints.
 
-You can receive Variables from the Request Body, Environment Variables & Url Parameter
+## Config
 
-You can template these Variables into Header, Body & Url
+| Key | Description | Default |
+| --- | ----------- | ------- |
+| port | Specifies the port crossover is listening | 9999 |
+| timeout | Sets the timeout for the specified endpoints | 15 |
+| logLevel | LogLevel (0=Debug, 1=Info, 2=Warn, 3=Error) | 1 |
+| envs | List of environment variables crossover should read | [] |
+| endpoints | List of specified endpoints | [] |
+| endpoints[].receiver | Endpoint that listens for incoming requests | |
+| endpoints[].receiver.path |||
+| endpoints[].receiver.method |||
+| endpoints[].receiver.urlParams |  | [] |
+| endpoints[].sender |  |  |
+| endpoints[].sender[].url |  |  |
+| endpoints[].sender[].method |  |  |
+| endpoints[].sender[].header |  |  |
+| endpoints[].sender[].body |  |  |
+| endpoints[].sender[].conditions |  |  |
 
-Crossover utilizes the golang template package and syntax
-
-### Logging
-
-Crossover knows 4 log levels (Debug, Info, Warn, Error).
-
-| Level | Name | Description |
-| ----- | ---- | ----------- |
-| 0     | Error | Error just logs error notifications and causes the programm to crash |
-| 1     | Warn | Warnings are errors that do not cause a crash of the application |
-| 2 | Info provides usefull information about the current state of the appliation |
-| 3 | Debug is usefull for debugging an error, as it provides a lot of information |
