@@ -3,16 +3,24 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gorilla/mux"
 )
 
 func main() {
-
-	config := GetConfig("./config.yml")
-
 	logger := GetLogger()
+
+	filepath := "./config.yml"
+
+	config, err := GetConfig(filepath)
+
+	if err != nil {
+		logger.Error(err.Error(), "filepath", filepath)
+		os.Exit(1)
+	}
+
 	SetLogLevel(config.LogLevel)
 
 	client := http.Client{}
