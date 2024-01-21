@@ -1,7 +1,11 @@
 ![Crossover Logo](./assets/header_dark.svg#gh-dark-mode-only)
 ![Crossover Logo](./assets/header_light.svg#gh-light-mode-only)
 
-Crossover is a lightweight and declarative webhook translator written in Go. So basically it receives HTTP-Requests on pre-configured endpoints and sends out HTTP-Request to different also configurable endpoints.
+Crossover is a lightweight and declarative webhook translator written in Go🩵  
+So basically it receives HTTP-Requests on pre-configured endpoints and sends out HTTP-Request to different also configurable endpoints.
+
+![Crossover Architecture Overview](./assets/overview_light.svg#gh-light-mode-only)
+![Crossover Architecture Overview](./assets/overview_dark.svg#gh-dark-mode-only)
 
 ## Config
 
