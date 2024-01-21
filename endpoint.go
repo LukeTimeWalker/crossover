@@ -78,12 +78,15 @@ func CreateSender(sender *Sender, endpoint *Endpoint, variables Variables, clien
 		if !EvaluateConditions(conditionTemplates, variables) {
 			logger.Info("Request was not send due the result of condtions evaluation")
 			w.WriteHeader(http.StatusOK)
+			return
 		}
 
 		req, err := http.NewRequest(sender.Method, senderUrl, bytes.NewReader([]byte(senderBody)))
 
 		if err != nil {
 			logger.Error("Could not create request", "error", err.Error())
+			w.WriteHeader(http.StatusBadRequest)
+			return
 		}
 
 		if sender.Header != nil {
@@ -98,16 +101,17 @@ func CreateSender(sender *Sender, endpoint *Endpoint, variables Variables, clien
 
 		if err != nil {
 			logger.Error("request failed", "error", err.Error())
+			w.WriteHeader(http.StatusBadRequest)
+			return
+
 		}
 
-		if res.StatusCode < 300 && res.StatusCode >= 200 {
+		if res.StatusCode < http.StatusMultipleChoices && res.StatusCode >= http.StatusOK {
 			logger.Info("Request successfull", "status", res.StatusCode)
 		} else {
 			logger.Error("request unsuccessfull", "status", res.StatusCode)
-		}
-
-		if err == nil {
-			w.WriteHeader(http.StatusOK)
+			w.WriteHeader(http.StatusBadRequest)
+			return
 		}
 	}
 
