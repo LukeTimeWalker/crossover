@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -34,22 +35,28 @@ type Sender struct {
 	Conditions []string          `yaml:"conditions"`
 }
 
-func GetConfig(filepath string) *Config {
-	config := Config{}
+func DefaultConfig() *Config {
+	return &Config{
+		Port:     9999,
+		Timeout:  15,
+		LogLevel: 1,
+	}
+}
 
-	logger := GetLogger()
+func GetConfig(filepath string) (*Config, error) {
+	config := DefaultConfig()
 
 	file, err := os.ReadFile(filepath)
 
 	if err != nil {
-		logger.Error("error reading config file", "file", filepath, "error", err)
+		return nil, errors.New("error reading config file")
 	}
 
-	err = yaml.Unmarshal(file, &config)
+	err = yaml.Unmarshal(file, config)
 
 	if err != nil {
-		logger.Error("error unmarshaling config file", "file", filepath, "error", err)
+		return nil, errors.New("error unmarshaling config file")
 	}
 
-	return &config
+	return config, nil
 }
