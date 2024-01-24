@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -14,6 +15,10 @@ func main() {
 
 	filepath := "./config.yml"
 
+	flag.StringVar(&filepath, "config", "./config.yml", "path to the configfile")
+
+	flag.Parse()
+
 	config, err := GetConfig(filepath)
 
 	if err != nil {
@@ -23,8 +28,6 @@ func main() {
 
 	SetLogLevel(config.LogLevel)
 
-	client := http.Client{}
-
 	var envs map[string]interface{}
 
 	if config.EnvironementVariables != nil {
@@ -32,11 +35,13 @@ func main() {
 		envs = LoadEnvs(config.EnvironementVariables)
 	}
 
+	client := http.Client{}
+
 	router := mux.NewRouter()
 
-	for _, endpoint := range config.Endpoints {
-		logger.Info("Registering Endpoint", "method", endpoint.Receiver.Method, "endpoint", endpoint.Receiver.Path)
-		RegisterEndpoint(router, &endpoint, &client, &envs)
+	for _, route := range config.Routes {
+		logger.Info("Registering Route", "method", route.Receiver.Method, "route", route.Receiver.Endpoint)
+		RegisterRoute(router, &route, &client, &envs)
 	}
 
 	logger.Info("Starting Crossover Server...")

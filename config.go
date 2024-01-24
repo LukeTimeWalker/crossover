@@ -8,27 +8,27 @@ import (
 )
 
 type Config struct {
-	Port                  int        `yaml:"port"`
-	Timeout               int        `yaml:"timeout"`
-	LogLevel              int        `yaml:"logLevel"`
-	Endpoints             []Endpoint `yaml:"endpoints"`
-	EnvironementVariables []string   `yaml:"envs"`
+	Port                  int      `yaml:"port"`
+	Timeout               int      `yaml:"timeout"`
+	LogLevel              int      `yaml:"logLevel"`
+	Routes                []Route  `yaml:"routes"`
+	EnvironementVariables []string `yaml:"envs"`
 }
 
-type Endpoint struct {
+type Route struct {
 	Receiver Receiver `yaml:"receiver"`
 	Sender   []Sender `yaml:"sender"`
 }
 
 type Receiver struct {
-	Path      string                 `yaml:"path"`
+	Endpoint  string                 `yaml:"endpoint"`
 	Method    string                 `yaml:"method"`
 	Body      map[string]interface{} `yaml:"body"`
 	UrlParams map[string]string      `yaml:"urlParams"`
 }
 
 type Sender struct {
-	Url        string            `yaml:"url"`
+	Endpoint   string            `yaml:"endpoint"`
 	Method     string            `yaml:"method"`
 	Body       string            `yaml:"body"`
 	Header     map[string]string `yaml:"header"`

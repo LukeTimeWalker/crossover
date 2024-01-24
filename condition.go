@@ -17,7 +17,11 @@ func EvaluateConditions(conditions []*template.Template, variables Variables) bo
 func EvaluateCondition(condition *template.Template, variables Variables) bool {
 	logger := GetLogger()
 
-	value := executeTemplate(condition, variables)
+	value, err := executeTemplate(condition, variables)
+
+	if err != nil {
+		logger.Error(err.Error())
+	}
 
 	result, err := strconv.ParseBool(value)
 
