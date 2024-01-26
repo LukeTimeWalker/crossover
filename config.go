@@ -16,8 +16,9 @@ type Config struct {
 }
 
 type Route struct {
-	Receiver Receiver `yaml:"receiver"`
-	Sender   []Sender `yaml:"sender"`
+	Receiver   Receiver `yaml:"receiver"`
+	Sender     []Sender `yaml:"sender"`
+	Conditions []string `yaml:"contitions"`
 }
 
 type Receiver struct {

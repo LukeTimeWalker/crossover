@@ -1,9 +1,22 @@
 package main
 
 import (
+	"fmt"
 	"strconv"
 	"text/template"
 )
+
+func CreateConditions(conditions []string) ([]*template.Template, error) {
+	conditionTemplates := make([]*template.Template, len(conditions))
+	for index, condition := range conditions {
+		template, err := CreateTemplate(fmt.Sprintf("condition[%d]", index), condition)
+		if err != nil {
+			return nil, err
+		}
+		conditionTemplates = append(conditionTemplates, template)
+	}
+	return conditionTemplates, nil
+}
 
 func EvaluateConditions(conditions []*template.Template, variables Variables) bool {
 	for _, condition := range conditions {
@@ -17,7 +30,7 @@ func EvaluateConditions(conditions []*template.Template, variables Variables) bo
 func EvaluateCondition(condition *template.Template, variables Variables) bool {
 	logger := GetLogger()
 
-	value, err := executeTemplate(condition, variables)
+	value, err := ExecuteTemplate(condition, variables)
 
 	if err != nil {
 		logger.Error(err.Error())
