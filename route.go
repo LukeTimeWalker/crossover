@@ -2,19 +2,15 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"net/http"
-	"path"
 	"text/template"
-
-	"github.com/gorilla/mux"
 )
 
 type Variables map[string]map[string]interface{}
 
 type PathHandler func(variables Variables) bool
 
-func RegisterRoute(router *mux.Router, route *Route, client *http.Client, envs *map[string]interface{}) {
+func CreateRouteHandler(route *Route, envs *map[string]interface{}, client *http.Client) (func(writer http.ResponseWriter, request *http.Request), error) {
 
 	variables := make(Variables)
 
@@ -23,36 +19,40 @@ func RegisterRoute(router *mux.Router, route *Route, client *http.Client, envs *
 	pathHandler := make([]PathHandler, len(route.Sender))
 
 	for index, sender := range route.Sender {
-		pathHandler[index] = CreatePathHandler(&route.Receiver, &sender, client)
+		handler, err := CreatePathHandler(&route.Receiver, &sender, client)
+		if err != nil {
+			return nil, err
+		}
+		pathHandler[index] = handler
 	}
 
-	routeHandler := CreateRouteHandler(route.Receiver, variables, pathHandler, route.Conditions)
-
-	receiverEndpoint := path.Clean(fmt.Sprintf("/%s", route.Receiver.Endpoint))
-
-	router.HandleFunc(receiverEndpoint, routeHandler).Methods(route.Receiver.Method)
-}
-
-func CreateRouteHandler(receiver Receiver, variables Variables, pathHandler []PathHandler, conditions []string) func(writer http.ResponseWriter, request *http.Request) {
-	logger := GetLogger()
-
-	routeConditionTemplates, err := CreateConditions(conditions)
+	routeConditionTemplates, err := CreateConditions(route.Conditions)
 
 	if err != nil {
-		logger.Error(err.Error())
+		return nil, err
 	}
 
-	return func(writer http.ResponseWriter, request *http.Request) {
+	routeHandler := func(writer http.ResponseWriter, request *http.Request) {
 
-		logger.Info("Executing route", "receiverEndpoint", receiver.Endpoint)
+		logger := GetLogger()
+
+		logger.Info("Executing route", "receiverEndpoint", route.Receiver.Endpoint)
 
 		variables["body"] = LoadBody(request)
 
-		if receiver.UrlParams != nil {
-			variables["url"] = LoadUrlParams(request.RequestURI, receiver.UrlParams)
+		if route.Receiver.UrlParams != nil {
+			variables["url"] = LoadUrlParams(request.RequestURI, route.Receiver.UrlParams)
 		}
 
-		if !EvaluateConditions(routeConditionTemplates, variables) {
+		conditionResult, err := EvaluateConditions(routeConditionTemplates, variables)
+
+		if err != nil {
+			logger.Error(err.Error())
+			writer.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		if !conditionResult {
 			logger.Info("Request was not send due the result of condtions evaluation")
 			writer.WriteHeader(http.StatusBadRequest)
 			return
@@ -69,10 +69,11 @@ func CreateRouteHandler(receiver Receiver, variables Variables, pathHandler []Pa
 
 		writer.WriteHeader(statusCode)
 	}
+
+	return routeHandler, nil
 }
 
-func CreatePathHandler(receiver *Receiver, sender *Sender, client *http.Client) PathHandler {
-	logger := GetLogger()
+func CreatePathHandler(receiver *Receiver, sender *Sender, client *http.Client) (PathHandler, error) {
 
 	var bodyTemplate *template.Template
 	var err error
@@ -80,7 +81,7 @@ func CreatePathHandler(receiver *Receiver, sender *Sender, client *http.Client) 
 	if sender.Body != "" {
 		bodyTemplate, err = CreateTemplate("bodyTemplate", sender.Body)
 		if err != nil {
-			logger.Error(err.Error())
+			return nil, err
 		}
 	}
 
@@ -89,7 +90,7 @@ func CreatePathHandler(receiver *Receiver, sender *Sender, client *http.Client) 
 	for key, value := range sender.Header {
 		template, err := CreateTemplate(key, value)
 		if err != nil {
-			logger.Error(err.Error())
+			return nil, err
 		}
 		headerTemplates = append(headerTemplates, template)
 	}
@@ -97,16 +98,19 @@ func CreatePathHandler(receiver *Receiver, sender *Sender, client *http.Client) 
 	conditionTemplates, err := CreateConditions(sender.Conditions)
 
 	if err != nil {
-		logger.Error(err.Error())
+		return nil, err
 	}
 
 	urlTemplate, err := CreateTemplate("urlTemplate", sender.Endpoint)
 
 	if err != nil {
-		logger.Error(err.Error())
+		return nil, err
 	}
 
 	pathHandler := func(variables Variables) bool {
+
+		logger := GetLogger()
+
 		senderBody, err := ExecuteTemplate(bodyTemplate, variables)
 
 		if err != nil {
@@ -123,7 +127,13 @@ func CreatePathHandler(receiver *Receiver, sender *Sender, client *http.Client) 
 
 		// Send
 
-		if !EvaluateConditions(conditionTemplates, variables) {
+		conditionResult, err := EvaluateConditions(conditionTemplates, variables)
+
+		if err != nil {
+			logger.Error(err.Error())
+			return false
+		}
+		if !conditionResult {
 			logger.Info("Request was not send due the result of condtions evaluation")
 			return false
 		}
@@ -156,8 +166,6 @@ func CreatePathHandler(receiver *Receiver, sender *Sender, client *http.Client) 
 			return false
 		}
 
-		fmt.Println(res.StatusCode, res.Status)
-
 		if res.StatusCode < http.StatusMultipleChoices && res.StatusCode >= http.StatusOK {
 			logger.Info("Request successfull", "status", res.StatusCode)
 		} else {
@@ -167,6 +175,6 @@ func CreatePathHandler(receiver *Receiver, sender *Sender, client *http.Client) 
 		return true
 	}
 
-	return pathHandler
+	return pathHandler, nil
 
 }

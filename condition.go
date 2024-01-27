@@ -18,31 +18,27 @@ func CreateConditions(conditions []string) ([]*template.Template, error) {
 	return conditionTemplates, nil
 }
 
-func EvaluateConditions(conditions []*template.Template, variables Variables) bool {
+func EvaluateConditions(conditions []*template.Template, variables Variables) (bool, error) {
 	for _, condition := range conditions {
-		if !EvaluateCondition(condition, variables) {
-			return false
+		result, err := EvaluateCondition(condition, variables)
+		if err != nil {
+			return false, err
+		}
+		if !result {
+			return false, nil
 		}
 	}
-	return true
+	return true, nil
 }
 
-func EvaluateCondition(condition *template.Template, variables Variables) bool {
-	logger := GetLogger()
-
+func EvaluateCondition(condition *template.Template, variables Variables) (bool, error) {
 	value, err := ExecuteTemplate(condition, variables)
-
 	if err != nil {
-		logger.Error(err.Error())
+		return false, err
 	}
-
 	result, err := strconv.ParseBool(value)
-
 	if err != nil {
-		logger.Error("condition does not evaluate to a boolean value", "condition", condition.Name(), "value", value)
-		return false
+		return false, fmt.Errorf("condition does not evaluate to a boolean value condition=%s value=%s", condition.Name(), value)
 	}
-	logger.Debug("condition evaluates to boolean value", "condition", condition.Name(), "value", result)
-
-	return result
+	return result, nil
 }

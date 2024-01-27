@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -15,7 +16,7 @@ func main() {
 
 	filepath := "./config.yml"
 
-	flag.StringVar(&filepath, "config", "./config.yml", "path to the configfile")
+	flag.StringVar(&filepath, "config", filepath, "path to the configfile")
 
 	flag.Parse()
 
@@ -41,7 +42,17 @@ func main() {
 
 	for _, route := range config.Routes {
 		logger.Info("Registering Route", "method", route.Receiver.Method, "route", route.Receiver.Endpoint)
-		RegisterRoute(router, &route, &client, &envs)
+
+		routeHandler, err := CreateRouteHandler(&route, &envs, &client)
+
+		if err != nil {
+			logger.Error(err.Error())
+			os.Exit(1)
+		}
+
+		receiverEndpoint := path.Clean(fmt.Sprintf("/%s", route.Receiver.Endpoint))
+
+		router.HandleFunc(receiverEndpoint, routeHandler).Methods(route.Receiver.Method)
 	}
 
 	logger.Info("Starting Crossover Server...")
