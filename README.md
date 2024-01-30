@@ -24,23 +24,6 @@ docker run -p 9999:9999 LukeTimeWalker/crossover
 
 ## Config
 
-| Key | Description | Default |
-| --- | ----------- | ------- |
-| port | Specifies the port crossover is listening | 9999 |
-| timeout | Sets the timeout for the specified routes | 15 |
-| logLevel | LogLevel (0=Debug, 1=Info, 2=Warn, 3=Error) | 1 |
-| envs | List of environment variables crossover should read | [] |
-| routes | List of specified routes | [] |
-| routes[].receiver | Route that listens for incoming requests | |
-| routes[].receiver.path |||
-| routes[].receiver.method |||
-| routes[].receiver.urlParams |  | [] |
-| routes[].sender |  |  |
-| routes[].sender[].url |  |  |
-| routes[].sender[].method |  |  |
-| routes[].sender[].header |  |  |
-| routes[].sender[].body |  |  |
-| routes[].sender[].conditions |  |  |
 
 ### Templating
 
