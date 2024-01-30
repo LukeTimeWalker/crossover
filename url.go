@@ -1,38 +1,40 @@
 package main
 
 import (
+	"fmt"
 	"net/url"
 	"strconv"
 )
 
-func LoadUrlParams(u string, urlParams map[string]string) map[string]interface{} {
-	logger := GetLogger()
-
+func LoadUrlParams(u string, urlParams map[string]string) (map[string]interface{}, error) {
 	ur, err := url.Parse(u)
 
 	if err != nil {
-		logger.Error("Could not parse url", "url", u, "error", err)
+		return nil, fmt.Errorf("could not parse url url=%s error=%s", u, err.Error())
 	}
 
 	params, err := url.ParseQuery(ur.RawQuery)
 
 	if err != nil {
-		logger.Error("Could not parse url params", "url", u, "error", err)
+		return nil, fmt.Errorf("could not parse url params url=%s error=%s", u, err.Error())
 	}
 
 	output := make(map[string]interface{})
 
 	for key, value := range urlParams {
-		output[key] = parseUrlParam(key, params.Get(key), value)
+		param, err := parseUrlParam(key, params.Get(key), value)
+
+		if err != nil {
+			return nil, err
+		}
+
+		output[key] = param
 	}
 
-	return output
+	return output, nil
 }
 
-func parseUrlParam(key string, value string, t string) interface{} {
-
-	logger := GetLogger()
-
+func parseUrlParam(key string, value string, t string) (interface{}, error) {
 	var returnValue interface{}
 
 	var err error
@@ -47,11 +49,12 @@ func parseUrlParam(key string, value string, t string) interface{} {
 	case "float":
 		returnValue, err = strconv.ParseFloat(value, 64)
 	default:
-		logger.Error("Unknown type for url param", "type", t)
-		returnValue = nil
+		return nil, fmt.Errorf("unknown type for url param type=%s", t)
 	}
+
 	if err != nil {
-		logger.Error("Could not parse url param", "param", key, "value", value, "expectedType", t)
+		return nil, fmt.Errorf("could not parse url param param=%s value=%s expectedType=%s", key, value, t)
 	}
-	return returnValue
+
+	return returnValue, nil
 }

@@ -18,6 +18,7 @@ func loadEnv(name string, vars map[string]interface{}) {
 	logger := GetLogger()
 
 	env, exists := os.LookupEnv(name)
+
 	if exists {
 		if env == "" {
 			logger.Warn("Environment variable is set but empty", "variable", name)

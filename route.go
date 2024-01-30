@@ -38,10 +38,25 @@ func CreateRouteHandler(route *Route, envs *map[string]interface{}, client *http
 
 		logger.Info("Executing route", "receiverEndpoint", route.Receiver.Endpoint)
 
-		variables["body"] = LoadBody(request)
+		body, err := LoadBody(request)
+
+		if err != nil {
+			logger.Error(err.Error())
+			writer.WriteHeader(http.StatusBadGateway)
+			return
+		}
+
+		variables["body"] = body
 
 		if route.Receiver.UrlParams != nil {
-			variables["url"] = LoadUrlParams(request.RequestURI, route.Receiver.UrlParams)
+			urlParams, err := LoadUrlParams(request.RequestURI, route.Receiver.UrlParams)
+
+			if err != nil {
+				logger.Error(err.Error())
+				writer.WriteHeader(http.StatusBadGateway)
+				return
+			}
+			variables["url"] = urlParams
 		}
 
 		conditionResult, err := EvaluateConditions(routeConditionTemplates, variables)

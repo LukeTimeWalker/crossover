@@ -1,7 +1,7 @@
 package main
 
 import (
-	"errors"
+	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -50,13 +50,13 @@ func GetConfig(filepath string) (*Config, error) {
 	file, err := os.ReadFile(filepath)
 
 	if err != nil {
-		return nil, errors.New("error reading config file")
+		return nil, fmt.Errorf("error reading config file error=%s", err.Error())
 	}
 
 	err = yaml.Unmarshal(file, config)
 
 	if err != nil {
-		return nil, errors.New("error unmarshaling config file")
+		return nil, fmt.Errorf("error unmarshaling config file error=%s", err.Error())
 	}
 
 	return config, nil
