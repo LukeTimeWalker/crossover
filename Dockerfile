@@ -13,8 +13,8 @@ RUN GOOS=linux go build -o /crossover
 
 FROM alpine:latest
 
-WORKDIR /
+WORKDIR /crossover
 
-COPY --from=build /crossover /crossover
+COPY --from=build /crossover /crossover/crossover
 
-ENTRYPOINT ["/crossover"]
+ENTRYPOINT ["./crossover"]
