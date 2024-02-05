@@ -6,6 +6,16 @@ import (
 	"text/template"
 )
 
+func CreateTemplate(name string, templateText string) (*template.Template, error) {
+	template, err := template.New(name).Parse(templateText)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not parse template name=%s error=%s", name, err.Error())
+	}
+
+	return template, nil
+}
+
 func ExecuteTemplate(template *template.Template, values interface{}) (string, error) {
 	var output bytes.Buffer
 
@@ -16,14 +26,4 @@ func ExecuteTemplate(template *template.Template, values interface{}) (string, e
 	}
 
 	return output.String(), nil
-}
-
-func CreateTemplate(name string, templateText string) (*template.Template, error) {
-	template, err := template.New(name).Parse(templateText)
-
-	if err != nil {
-		return nil, fmt.Errorf("could not parse template name=%s error=%s", name, err.Error())
-	}
-
-	return template, nil
 }

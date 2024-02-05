@@ -36,14 +36,12 @@ func main() {
 		envs = LoadEnvs(config.EnvironementVariables)
 	}
 
-	client := http.Client{}
-
 	router := mux.NewRouter()
 
 	for _, route := range config.Routes {
 		logger.Info("Registering Route", "method", route.Receiver.Method, "route", route.Receiver.Endpoint)
 
-		routeHandler, err := CreateRouteHandler(&route, &envs, &client)
+		routeHandler, err := CreateRouteHandler(&route, &envs)
 
 		if err != nil {
 			logger.Error(err.Error())

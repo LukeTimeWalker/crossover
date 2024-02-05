@@ -10,7 +10,9 @@ type Variables map[string]map[string]interface{}
 
 type PathHandler func(variables Variables) bool
 
-func CreateRouteHandler(route *Route, envs *map[string]interface{}, client *http.Client) (func(writer http.ResponseWriter, request *http.Request), error) {
+func CreateRouteHandler(route *Route, envs *map[string]interface{}) (func(writer http.ResponseWriter, request *http.Request), error) {
+
+	client := http.Client{}
 
 	variables := make(Variables)
 
@@ -19,7 +21,7 @@ func CreateRouteHandler(route *Route, envs *map[string]interface{}, client *http
 	pathHandler := make([]PathHandler, len(route.Sender))
 
 	for index, sender := range route.Sender {
-		handler, err := CreatePathHandler(&route.Receiver, &sender, client)
+		handler, err := CreatePathHandler(&route.Receiver, &sender, &client)
 		if err != nil {
 			return nil, err
 		}
@@ -42,7 +44,7 @@ func CreateRouteHandler(route *Route, envs *map[string]interface{}, client *http
 
 		if err != nil {
 			logger.Error(err.Error())
-			writer.WriteHeader(http.StatusBadGateway)
+			writer.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
@@ -53,7 +55,7 @@ func CreateRouteHandler(route *Route, envs *map[string]interface{}, client *http
 
 			if err != nil {
 				logger.Error(err.Error())
-				writer.WriteHeader(http.StatusBadGateway)
+				writer.WriteHeader(http.StatusBadRequest)
 				return
 			}
 			variables["url"] = urlParams

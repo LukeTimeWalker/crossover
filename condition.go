@@ -24,7 +24,7 @@ func CreateConditions(conditions []string) ([]*template.Template, error) {
 
 func EvaluateConditions(conditions []*template.Template, variables Variables) (bool, error) {
 	for _, condition := range conditions {
-		result, err := EvaluateCondition(condition, variables)
+		result, err := evaluateCondition(condition, variables)
 
 		if err != nil {
 			return false, err
@@ -38,7 +38,7 @@ func EvaluateConditions(conditions []*template.Template, variables Variables) (b
 	return true, nil
 }
 
-func EvaluateCondition(condition *template.Template, variables Variables) (bool, error) {
+func evaluateCondition(condition *template.Template, variables Variables) (bool, error) {
 	value, err := ExecuteTemplate(condition, variables)
 
 	if err != nil {
