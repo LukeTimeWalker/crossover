@@ -10,9 +10,7 @@ type Variables map[string]map[string]interface{}
 
 type PathHandler func(variables Variables) bool
 
-func CreateRouteHandler(route *Route, envs *map[string]interface{}) (func(writer http.ResponseWriter, request *http.Request), error) {
-
-	client := http.Client{}
+func CreateRouteHandler(route *RouteConfig, envs *map[string]interface{}) (func(writer http.ResponseWriter, request *http.Request), error) {
 
 	variables := make(Variables)
 
@@ -21,7 +19,7 @@ func CreateRouteHandler(route *Route, envs *map[string]interface{}) (func(writer
 	pathHandler := make([]PathHandler, len(route.Sender))
 
 	for index, sender := range route.Sender {
-		handler, err := CreatePathHandler(&route.Receiver, &sender, &client)
+		handler, err := CreatePathHandler(&route.Receiver, &sender)
 		if err != nil {
 			return nil, err
 		}
@@ -90,13 +88,13 @@ func CreateRouteHandler(route *Route, envs *map[string]interface{}) (func(writer
 	return routeHandler, nil
 }
 
-func CreatePathHandler(receiver *Receiver, sender *Sender, client *http.Client) (PathHandler, error) {
+func CreatePathHandler(receiverConfig *ReceiverConfig, senderConfig *SenderConfig) (PathHandler, error) {
 
 	var bodyTemplate *template.Template
 	var err error
 
-	if sender.Body != "" {
-		bodyTemplate, err = CreateTemplate("bodyTemplate", sender.Body)
+	if senderConfig.Body != "" {
+		bodyTemplate, err = CreateTemplate("bodyTemplate", senderConfig.Body)
 		if err != nil {
 			return nil, err
 		}
@@ -104,7 +102,7 @@ func CreatePathHandler(receiver *Receiver, sender *Sender, client *http.Client) 
 
 	var headerTemplates []*template.Template
 
-	for key, value := range sender.Header {
+	for key, value := range senderConfig.Header {
 		template, err := CreateTemplate(key, value)
 		if err != nil {
 			return nil, err
@@ -112,13 +110,19 @@ func CreatePathHandler(receiver *Receiver, sender *Sender, client *http.Client) 
 		headerTemplates = append(headerTemplates, template)
 	}
 
-	conditionTemplates, err := CreateConditions(sender.Conditions)
+	conditionTemplates, err := CreateConditions(senderConfig.Conditions)
 
 	if err != nil {
 		return nil, err
 	}
 
-	urlTemplate, err := CreateTemplate("urlTemplate", sender.Endpoint)
+	urlTemplate, err := CreateTemplate("urlTemplate", senderConfig.Endpoint)
+
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := GetClient(senderConfig.Client)
 
 	if err != nil {
 		return nil, err
@@ -155,14 +159,14 @@ func CreatePathHandler(receiver *Receiver, sender *Sender, client *http.Client) 
 			return false
 		}
 
-		req, err := http.NewRequest(sender.Method, senderUrl, bytes.NewReader([]byte(senderBody)))
+		req, err := http.NewRequest(senderConfig.Method, senderUrl, bytes.NewReader([]byte(senderBody)))
 
 		if err != nil {
 			logger.Error("Could not create request", "error", err.Error())
 			return false
 		}
 
-		if sender.Header != nil {
+		if senderConfig.Header != nil {
 			for _, tmpl := range headerTemplates {
 				header, err := ExecuteTemplate(tmpl, variables)
 
@@ -174,7 +178,7 @@ func CreatePathHandler(receiver *Receiver, sender *Sender, client *http.Client) 
 			}
 		}
 
-		logger.Debug("Sending request", "method", sender.Method, "url", senderUrl)
+		logger.Debug("Sending request", "method", senderConfig.Method, "url", senderUrl)
 
 		res, err := client.Do(req)
 

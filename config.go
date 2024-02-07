@@ -8,32 +8,38 @@ import (
 )
 
 type Config struct {
-	Port                  int      `yaml:"port"`
-	Timeout               int      `yaml:"timeout"`
-	LogLevel              int      `yaml:"logLevel"`
-	Routes                []Route  `yaml:"routes"`
-	EnvironementVariables []string `yaml:"envs"`
+	Port                  int           `yaml:"port"`
+	Timeout               int           `yaml:"timeout"`
+	LogLevel              int           `yaml:"logLevel"`
+	Routes                []RouteConfig `yaml:"routes"`
+	EnvironementVariables []string      `yaml:"envs"`
 }
 
-type Route struct {
-	Receiver   Receiver `yaml:"receiver"`
-	Sender     []Sender `yaml:"sender"`
-	Conditions []string `yaml:"contitions"`
+type RouteConfig struct {
+	Receiver   ReceiverConfig `yaml:"receiver"`
+	Sender     []SenderConfig `yaml:"sender"`
+	Conditions []string       `yaml:"contitions"`
 }
 
-type Receiver struct {
+type ReceiverConfig struct {
 	Endpoint  string                 `yaml:"endpoint"`
 	Method    string                 `yaml:"method"`
 	Body      map[string]interface{} `yaml:"body"`
 	UrlParams map[string]string      `yaml:"urlParams"`
 }
 
-type Sender struct {
+type SenderConfig struct {
 	Endpoint   string            `yaml:"endpoint"`
 	Method     string            `yaml:"method"`
 	Body       string            `yaml:"body"`
 	Header     map[string]string `yaml:"header"`
+	Client     ClientConfig      `yaml:"client"`
 	Conditions []string          `yaml:"conditions"`
+}
+
+type ClientConfig struct {
+	Timeout       int  `yaml:"timeout"`
+	TlsSkipVerify bool `yaml:"tlsSkipVerify"`
 }
 
 func DefaultConfig() *Config {
