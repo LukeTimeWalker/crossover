@@ -10,7 +10,9 @@ type Variables map[string]map[string]interface{}
 
 type PathHandler func(variables Variables) bool
 
-func CreateRouteHandler(route *RouteConfig, envs *map[string]interface{}) (func(writer http.ResponseWriter, request *http.Request), error) {
+type RouteHandler func(writer http.ResponseWriter, request *http.Request)
+
+func CreateRouteHandler(route *RouteConfig, envs *map[string]interface{}) (RouteHandler, error) {
 
 	variables := make(Variables)
 
