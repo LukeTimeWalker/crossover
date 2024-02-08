@@ -102,14 +102,14 @@ func CreatePathHandler(receiverConfig *ReceiverConfig, senderConfig *SenderConfi
 		}
 	}
 
-	var headerTemplates []*template.Template
+	var headerTemplates map[string]*template.Template
 
 	for key, value := range senderConfig.Header {
 		template, err := CreateTemplate(key, value)
 		if err != nil {
 			return nil, err
 		}
-		headerTemplates = append(headerTemplates, template)
+		headerTemplates[key] = template
 	}
 
 	conditionTemplates, err := CreateConditions(senderConfig.Conditions)
@@ -156,9 +156,10 @@ func CreatePathHandler(receiverConfig *ReceiverConfig, senderConfig *SenderConfi
 			logger.Error(err.Error())
 			return false
 		}
+
 		if !conditionResult {
 			logger.Info("Request was not send due the result of condtions evaluation")
-			return false
+			return true
 		}
 
 		req, err := http.NewRequest(senderConfig.Method, senderUrl, bytes.NewReader([]byte(senderBody)))
@@ -168,16 +169,14 @@ func CreatePathHandler(receiverConfig *ReceiverConfig, senderConfig *SenderConfi
 			return false
 		}
 
-		if senderConfig.Header != nil {
-			for _, tmpl := range headerTemplates {
-				header, err := ExecuteTemplate(tmpl, variables)
+		for key, tmpl := range headerTemplates {
+			header, err := ExecuteTemplate(tmpl, variables)
 
-				if err != nil {
-					logger.Error(err.Error())
-				}
-
-				req.Header.Add(tmpl.Name(), header)
+			if err != nil {
+				logger.Error(err.Error())
 			}
+
+			req.Header.Add(key, header)
 		}
 
 		logger.Debug("Sending request", "method", senderConfig.Method, "url", senderUrl)
@@ -189,13 +188,13 @@ func CreatePathHandler(receiverConfig *ReceiverConfig, senderConfig *SenderConfi
 			return false
 		}
 
-		if res.StatusCode < http.StatusMultipleChoices && res.StatusCode >= http.StatusOK {
+		if res.StatusCode >= http.StatusOK && res.StatusCode < http.StatusMultipleChoices {
 			logger.Info("Request successfull", "status", res.StatusCode)
-		} else {
-			logger.Error("request unsuccessfull", "status", res.StatusCode)
-			return false
+			return true
 		}
-		return true
+		logger.Error("request unsuccessfull", "status", res.StatusCode)
+		return false
+
 	}
 
 	return pathHandler, nil

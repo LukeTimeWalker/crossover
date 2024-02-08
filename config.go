@@ -45,7 +45,7 @@ type ClientConfig struct {
 func DefaultConfig() *Config {
 	return &Config{
 		Port:     9999,
-		Timeout:  15,
+		Timeout:  10,
 		LogLevel: 1,
 	}
 }
