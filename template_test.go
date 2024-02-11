@@ -38,12 +38,12 @@ var _ = Describe("Template", func() {
 
 	Describe("Executing a template", func() {
 		template, _ := main.CreateTemplate("testTemplate", testTemplate)
-		values := main.Variables{
-			"env":  map[string]interface{}{"TITLE": "testTitle"},
-			"body": map[string]interface{}{"test": "bodyContent", "array": []string{"1", "2", "3"}},
-			"url":  map[string]interface{}{"url": "param"}}
 
 		Context("with all values available", func() {
+			values := main.Variables{
+				"env":  map[string]interface{}{"TITLE": "testTitle"},
+				"body": map[string]interface{}{"test": "bodyContent", "array": []string{"1", "2", "3"}},
+				"url":  map[string]interface{}{"url": "param"}}
 			result, err := main.ExecuteTemplate(template, values)
 			It("should not throw an error", func() {
 				Expect(err).To(BeNil())
@@ -55,6 +55,19 @@ var _ = Describe("Template", func() {
 			"description": "Body: bodyContent  \n3  \nparam"
 		}
 	`))
+			})
+		})
+		Context("with missing values", func() {
+			values := main.Variables{
+				"env":  map[string]interface{}{"TITLE": "testTitle"},
+				"body": map[string]interface{}{"test": "bodyContent"},
+				"url":  map[string]interface{}{"url": "param"}}
+			result, err := main.ExecuteTemplate(template, values)
+			It("should throw an error", func() {
+				Expect(err).ToNot(BeNil())
+			})
+			It("should return an empty string", func() {
+				Expect(result).To(Equal(""))
 			})
 		})
 	})
