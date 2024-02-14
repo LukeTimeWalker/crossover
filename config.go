@@ -18,7 +18,7 @@ type Config struct {
 type RouteConfig struct {
 	Receiver   ReceiverConfig `yaml:"receiver"`
 	Sender     []SenderConfig `yaml:"sender"`
-	Conditions []string       `yaml:"contitions"`
+	Conditions []string       `yaml:"conditions"`
 }
 
 type ReceiverConfig struct {

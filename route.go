@@ -91,19 +91,12 @@ func CreateRouteHandler(route *RouteConfig, envs *map[string]interface{}) (Route
 }
 
 func CreatePathHandler(receiverConfig *ReceiverConfig, senderConfig *SenderConfig) (PathHandler, error) {
-
-	var bodyTemplate *template.Template
-	var err error
-
-	if senderConfig.Body != "" {
-		bodyTemplate, err = CreateTemplate("bodyTemplate", senderConfig.Body)
-		if err != nil {
-			return nil, err
-		}
+	bodyTemplate, err := CreateTemplate("bodyTemplate", senderConfig.Body)
+	if err != nil {
+		return nil, err
 	}
 
-	var headerTemplates map[string]*template.Template
-
+	headerTemplates := make(map[string]*template.Template)
 	for key, value := range senderConfig.Header {
 		template, err := CreateTemplate(key, value)
 		if err != nil {
@@ -113,57 +106,48 @@ func CreatePathHandler(receiverConfig *ReceiverConfig, senderConfig *SenderConfi
 	}
 
 	conditionTemplates, err := CreateConditions(senderConfig.Conditions)
-
 	if err != nil {
 		return nil, err
 	}
 
 	urlTemplate, err := CreateTemplate("urlTemplate", senderConfig.Endpoint)
-
 	if err != nil {
 		return nil, err
 	}
 
 	client, err := GetClient(senderConfig.Client)
-
 	if err != nil {
 		return nil, err
 	}
 
 	pathHandler := func(variables Variables) bool {
-
 		logger := GetLogger()
 
 		senderBody, err := ExecuteTemplate(bodyTemplate, variables)
-
 		if err != nil {
 			logger.Error(err.Error())
 			return false
 		}
 
 		senderUrl, err := ExecuteTemplate(urlTemplate, variables)
-
 		if err != nil {
 			logger.Error(err.Error())
 			return false
 		}
 
 		// Send
-
 		conditionResult, err := EvaluateConditions(conditionTemplates, variables)
-
 		if err != nil {
 			logger.Error(err.Error())
 			return false
 		}
 
 		if !conditionResult {
-			logger.Info("Request was not send due the result of condtions evaluation")
+			logger.Info("Request was not sent due to the result of conditions evaluation")
 			return true
 		}
 
 		req, err := http.NewRequest(senderConfig.Method, senderUrl, bytes.NewReader([]byte(senderBody)))
-
 		if err != nil {
 			logger.Error("Could not create request", "error", err.Error())
 			return false
@@ -171,32 +155,28 @@ func CreatePathHandler(receiverConfig *ReceiverConfig, senderConfig *SenderConfi
 
 		for key, tmpl := range headerTemplates {
 			header, err := ExecuteTemplate(tmpl, variables)
-
 			if err != nil {
 				logger.Error(err.Error())
 			}
-
 			req.Header.Add(key, header)
 		}
 
 		logger.Debug("Sending request", "method", senderConfig.Method, "url", senderUrl)
 
 		res, err := client.Do(req)
-
 		if err != nil {
-			logger.Error("request failed", "error", err.Error())
+			logger.Error("Request failed", "error", err.Error())
 			return false
 		}
 
 		if res.StatusCode >= http.StatusOK && res.StatusCode < http.StatusMultipleChoices {
-			logger.Info("Request successfull", "status", res.StatusCode)
+			logger.Info("Request successful", "status", res.StatusCode)
 			return true
 		}
-		logger.Error("request unsuccessfull", "status", res.StatusCode)
-		return false
 
+		logger.Error("Request unsuccessful", "status", res.StatusCode)
+		return false
 	}
 
 	return pathHandler, nil
-
 }

@@ -18,10 +18,10 @@ var loggerInstance *slog.Logger
 var globalLogLevel = slog.LevelDebug
 
 var logLevelMap = map[int]slog.Level{
-	0: slog.LevelDebug,
-	1: slog.LevelInfo,
-	2: slog.LevelWarn,
-	3: slog.LevelError,
+	0: slog.LevelError,
+	1: slog.LevelWarn,
+	2: slog.LevelInfo,
+	3: slog.LevelDebug,
 }
 
 func GetLogger() *slog.Logger {
@@ -39,7 +39,7 @@ func SetLogLevel(logLevel int) {
 	if level, ok := logLevelMap[logLevel]; ok {
 		globalLogLevel = level
 	} else {
-		panic("Undefined Log Level: ")
+		panic(fmt.Sprintf("invalid log level: %v", logLevel))
 	}
 }
 

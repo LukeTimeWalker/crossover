@@ -20,11 +20,10 @@ func loadEnv(name string, vars map[string]interface{}) {
 	if exists {
 		if env == "" {
 			logger.Warn("Environment variable is empty", "variable", name)
-			vars[name] = env
 		} else {
 			logger.Debug("Environment variable found", "variable", name)
-			vars[name] = env
 		}
+		vars[name] = env
 	} else {
 		logger.Warn("Environment variable not found", "variable", name)
 	}

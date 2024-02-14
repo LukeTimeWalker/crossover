@@ -12,7 +12,7 @@ func LoadBody(request *http.Request) (map[string]interface{}, error) {
 	err := json.NewDecoder(request.Body).Decode(&body)
 
 	if err != nil {
-		return nil, fmt.Errorf("couldn't decode json error=%s", err.Error())
+		return nil, fmt.Errorf("failed to decode json error=%s", err.Error())
 	}
 
 	return body, nil
