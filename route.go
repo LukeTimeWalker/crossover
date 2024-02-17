@@ -14,18 +14,14 @@ type RouteHandler func(writer http.ResponseWriter, request *http.Request)
 
 func CreateRouteHandler(route *RouteConfig, envs *map[string]interface{}) (RouteHandler, error) {
 
-	variables := make(Variables)
-
-	variables["envs"] = *envs
-
-	pathHandler := make([]PathHandler, len(route.Sender))
+	pathHandlers := make([]PathHandler, len(route.Sender))
 
 	for index, sender := range route.Sender {
 		handler, err := CreatePathHandler(&route.Receiver, &sender)
 		if err != nil {
 			return nil, err
 		}
-		pathHandler[index] = handler
+		pathHandlers[index] = handler
 	}
 
 	routeConditionTemplates, err := CreateConditions(route.Conditions)
@@ -48,8 +44,6 @@ func CreateRouteHandler(route *RouteConfig, envs *map[string]interface{}) (Route
 			return
 		}
 
-		variables["body"] = body
-
 		urlParams, err := LoadUrlParams(request.RequestURI)
 
 		if err != nil {
@@ -57,7 +51,12 @@ func CreateRouteHandler(route *RouteConfig, envs *map[string]interface{}) (Route
 			writer.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		variables["url"] = urlParams
+
+		variables := Variables{
+			"body": body,
+			"url":  urlParams,
+			"env":  *envs,
+		}
 
 		conditionResult, err := EvaluateConditions(routeConditionTemplates, variables)
 
@@ -68,17 +67,17 @@ func CreateRouteHandler(route *RouteConfig, envs *map[string]interface{}) (Route
 		}
 
 		if !conditionResult {
-			logger.Info("Request was not send due the result of condtions evaluation")
-			writer.WriteHeader(http.StatusBadRequest)
+			logger.Info("Request was not sent due to the result of condtions evaluation")
+			writer.WriteHeader(http.StatusOK)
 			return
 		}
 
 		statusCode := http.StatusOK
 
-		for _, handler := range pathHandler {
+		for _, handler := range pathHandlers {
 			success := handler(variables)
 			if !success {
-				statusCode = 400
+				statusCode = http.StatusBadRequest
 			}
 		}
 
