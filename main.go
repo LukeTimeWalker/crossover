@@ -7,8 +7,6 @@ import (
 	"os"
 	"path"
 	"time"
-
-	"github.com/gorilla/mux"
 )
 
 func main() {
@@ -36,7 +34,7 @@ func main() {
 		envs = LoadEnvs(config.EnvironementVariables)
 	}
 
-	router := mux.NewRouter()
+	router := http.NewServeMux()
 
 	for _, route := range config.Routes {
 		logger.Info("Registering Route", "method", route.Receiver.Method, "route", route.Receiver.Endpoint)
@@ -50,7 +48,7 @@ func main() {
 
 		receiverEndpoint := path.Clean(fmt.Sprintf("/%s", route.Receiver.Endpoint))
 
-		router.HandleFunc(receiverEndpoint, routeHandler).Methods(route.Receiver.Method)
+		router.HandleFunc(fmt.Sprintf("%s %s", route.Receiver.Method, receiverEndpoint), routeHandler)
 	}
 
 	logger.Info("Starting Crossover Server...")
