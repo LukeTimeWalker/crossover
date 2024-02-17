@@ -50,16 +50,14 @@ func CreateRouteHandler(route *RouteConfig, envs *map[string]interface{}) (Route
 
 		variables["body"] = body
 
-		if route.Receiver.UrlParams != nil {
-			urlParams, err := LoadUrlParams(request.RequestURI, route.Receiver.UrlParams)
+		urlParams, err := LoadUrlParams(request.RequestURI)
 
-			if err != nil {
-				logger.Error(err.Error())
-				writer.WriteHeader(http.StatusBadRequest)
-				return
-			}
-			variables["url"] = urlParams
+		if err != nil {
+			logger.Error(err.Error())
+			writer.WriteHeader(http.StatusBadRequest)
+			return
 		}
+		variables["url"] = urlParams
 
 		conditionResult, err := EvaluateConditions(routeConditionTemplates, variables)
 

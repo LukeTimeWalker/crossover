@@ -9,6 +9,7 @@ func LoadEnvs(environmentVariables []string) map[string]interface{} {
 	for _, env := range environmentVariables {
 		loadEnv(env, envs)
 	}
+
 	return envs
 }
 

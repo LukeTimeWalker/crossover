@@ -22,10 +22,8 @@ type RouteConfig struct {
 }
 
 type ReceiverConfig struct {
-	Endpoint  string                 `yaml:"endpoint"`
-	Method    string                 `yaml:"method"`
-	Body      map[string]interface{} `yaml:"body"`
-	UrlParams map[string]string      `yaml:"urlParams"`
+	Endpoint string `yaml:"endpoint"`
+	Method   string `yaml:"method"`
 }
 
 type SenderConfig struct {
@@ -54,13 +52,11 @@ func GetConfig(filepath string) (*Config, error) {
 	config := DefaultConfig()
 
 	file, err := os.ReadFile(filepath)
-
 	if err != nil {
 		return nil, fmt.Errorf("error reading config file error=%s", err.Error())
 	}
 
 	err = yaml.Unmarshal(file, config)
-
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshaling config file error=%s", err.Error())
 	}
