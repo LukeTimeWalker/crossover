@@ -4,8 +4,8 @@ on:
     branches:
       - main
 jobs:
-  build:
-    name: Build
+  compile:
+    name: Compile
     runs-on: self-hosted
     steps:
       - name: Checkout the Codebase.
@@ -20,3 +20,8 @@ jobs:
         run: go test ./...
       - name: Build
         run: go build
+  build-docker-image:
+    name: Build Docker Image
+    runs-on: self-hosted
+    steps:
+      - name: 

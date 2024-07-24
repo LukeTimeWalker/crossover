@@ -10,7 +10,7 @@ This project focuses on `minimalism` and `simplicity`.
 
 ## Installation
 
-To install crossover, you can either simply download the corresponding binary or use the docker image.
+To install crossover, you can either download the binary or use the docker image.
 
 ## Usage
 
@@ -30,15 +30,43 @@ docker run -v ./config.yml:/crossover/config.yml -p 9999:9999 crossover
 
 ## Config
 
+The following config configures crossover to handle a route that opens a new GitLab Issue every time it receives a request on the /gitlab endpoint.
+
+```yaml
+port: 9999 # port on which crossover listens
+timeout: 15 # timeout in seconds
+logLevel: 3 # log level
+envs: # list of environment variable names that should be used for templating
+  - TOKEN
+  - PROJECT_ID
+routes: # list of routes that crossover should handle
+  - receiver:
+      endpoint: gitlab # endpoint on which crossover listens for this route
+      method: POST # HTTP method for which crossover listens for this route
+    sender:
+      - endpoint: https://gitlab.com/api/v4/projects/{{ .env.PROJECT_ID }}/issues # endpoint to which a http request will be send
+        method: POST # HTTP method
+        header:
+          Content-Type: application/json
+          Authorization: "Bearer {{ env.TOKEN }}"
+        body: |
+          {
+            "title": "[Grafana Alert] {{ .body.title }}",
+            "description": "Number of alerts: {{ len .body.alerts}}\nMessage: {{ .body.message}}"
+          }
+    conditions:
+      - '{{ eq .body.status "firing" }}'
+```
+
 ## Templating
 
-Crossover leverages the `text/tempalte` module so the familiar go template syntax can be used to template `header`, `body` and `url`.
-
-The variables for templating can be 
-
+Crossover leverages Go's `text/tempalte` module so the familiar go template syntax can be used to template the `body`, `endpoint` and `header` fields.
+`Environment variables`, `URL values` and `body values` can all be used as variables.
 
 ## Conditions
 
 It is possible to define conditions for a route as well as for individual sender, which must be fulfilled before an HTTP request is sent from Crossover. If one of the conditions fails, no request is sent.
-To define conditions, the same variables can be accessed as for templating the body, URL and header
+To define conditions, the same variables can be used as for templating the `body`, `endpoint` and `header` fields.
+
+Use multiple conditions for logical conjuction and the `or` function within a condition for logical disjunction
 
