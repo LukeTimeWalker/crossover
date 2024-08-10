@@ -1,7 +1,10 @@
 name: Renovate
 on:
-  schedule:
-    - cron: '0 0 * * *'
+  # schedule:
+  #   - cron: '30 13 * * *'
+  push:
+    branches:
+      - main
 jobs:
   renovate:
     name: Renovate
@@ -13,3 +16,4 @@ jobs:
         uses: renovatebot/github-action@v40.2.5
         with:
           token: ${{ secrets.RENOVATE_TOKEN }}
+          configurationFile: .github/renovate.json
