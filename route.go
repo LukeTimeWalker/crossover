@@ -36,12 +36,16 @@ func CreateRouteHandler(route *RouteConfig, envs *map[string]interface{}) (Route
 
 		logger.Info("Executing route", "receiverEndpoint", route.Receiver.Endpoint)
 
-		body, err := LoadBody(request)
+		body := make(map[string]interface{})
 
-		if err != nil {
-			logger.Error(err.Error())
-			writer.WriteHeader(http.StatusBadRequest)
-			return
+		if request.Body != http.NoBody {
+			body, err = LoadBody(request)
+
+			if err != nil {
+				logger.Error(err.Error())
+				writer.WriteHeader(http.StatusBadRequest)
+				return
+			}
 		}
 
 		urlParams, err := LoadUrlParams(request.RequestURI)
@@ -121,6 +125,7 @@ func CreatePathHandler(receiverConfig *ReceiverConfig, senderConfig *SenderConfi
 		logger := GetLogger()
 
 		senderBody, err := ExecuteTemplate(bodyTemplate, variables)
+
 		if err != nil {
 			logger.Error(err.Error())
 			return false

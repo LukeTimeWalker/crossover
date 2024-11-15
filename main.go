@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+
 	logger := GetLogger()
 
 	filepath := "./config.yml"
@@ -37,7 +38,7 @@ func main() {
 	router := http.NewServeMux()
 
 	for _, route := range config.Routes {
-		logger.Info("Registering Route", "method", route.Receiver.Method, "route", route.Receiver.Endpoint)
+		logger.Info("Registering Route", "name", route.Name, "method", route.Receiver.Method, "route", route.Receiver.Endpoint)
 
 		routeHandler, err := CreateRouteHandler(&route, &envs)
 
