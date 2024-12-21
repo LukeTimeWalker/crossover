@@ -15,7 +15,7 @@ jobs:
         with:
           go-version-file: 'go.mod'
       - name: Install Dependencies
-        run: go get .
+        run: go get ./...
       - name: Running Tests
         run: go test ./...
       - name: Build
