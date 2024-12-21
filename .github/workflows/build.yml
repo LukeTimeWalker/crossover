@@ -1,12 +1,10 @@
-name: Dev Pipeline
+name: Prod Pipeline
 on:
   push:
-    branches:
-      - '**'
-      - '!main'
+
 jobs:
-  build:
-    name: Build
+  compile:
+    name: Compile
     runs-on: self-hosted
     steps:
       - name: Checkout the Codebase.
@@ -16,8 +14,8 @@ jobs:
         with:
           go-version-file: 'go.mod'
       - name: Install Dependencies
-        run: go get .
+        run: go get ./...
       - name: Running Tests
         run: go test ./...
       - name: Build
-        run: go build
+        run: go build ./cmd/crossover/main.go
