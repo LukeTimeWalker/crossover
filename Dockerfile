@@ -1,4 +1,4 @@
-FROM golang:alpine AS build
+FROM golang:1.23 AS build
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ COPY *.go ./
 RUN GOOS=linux go build -o /crossover
 
 
-FROM alpine:latest
+FROM gcr.io/distroless/static-debian12
 
 WORKDIR /crossover
 
