@@ -7,11 +7,14 @@ import (
 	"os"
 	"path"
 	"time"
+
+	"github.com/LukeTimeWalker/crossover/pkg/crossover"
+	"github.com/LukeTimeWalker/crossover/pkg/utils"
 )
 
 func main() {
 
-	logger := GetLogger()
+	logger := utils.GetLogger()
 
 	filepath := "./config.yml"
 
@@ -19,20 +22,20 @@ func main() {
 
 	flag.Parse()
 
-	config, err := GetConfig(filepath)
+	config, err := crossover.GetConfig(filepath)
 
 	if err != nil {
 		logger.Error(err.Error(), "filepath", filepath)
 		os.Exit(1)
 	}
 
-	SetLogLevel(config.LogLevel)
+	utils.SetLogLevel(config.LogLevel)
 
 	var envs map[string]interface{}
 
 	if config.EnvironementVariables != nil {
 		logger.Info("Reading Environment Variables...")
-		envs = LoadEnvs(config.EnvironementVariables)
+		envs = utils.LoadEnvs(config.EnvironementVariables)
 	}
 
 	router := http.NewServeMux()
@@ -40,7 +43,7 @@ func main() {
 	for _, route := range config.Routes {
 		logger.Info("Registering Route", "name", route.Name, "method", route.Receiver.Method, "route", route.Receiver.Endpoint)
 
-		routeHandler, err := CreateRouteHandler(&route, &envs)
+		routeHandler, err := crossover.CreateRouteHandler(&route, &envs)
 
 		if err != nil {
 			logger.Error(err.Error())

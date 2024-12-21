@@ -1,9 +1,11 @@
-package main
+package crossover
 
 import (
 	"bytes"
 	"net/http"
 	"text/template"
+
+	"github.com/LukeTimeWalker/crossover/pkg/utils"
 )
 
 type Variables map[string]map[string]interface{}
@@ -12,7 +14,7 @@ type PathHandler func(variables Variables) bool
 
 type RouteHandler func(writer http.ResponseWriter, request *http.Request)
 
-func CreateRouteHandler(route *RouteConfig, envs *map[string]interface{}) (RouteHandler, error) {
+func CreateRouteHandler(route *Route, envs *map[string]interface{}) (RouteHandler, error) {
 
 	pathHandlers := make([]PathHandler, len(route.Sender))
 
@@ -32,14 +34,14 @@ func CreateRouteHandler(route *RouteConfig, envs *map[string]interface{}) (Route
 
 	routeHandler := func(writer http.ResponseWriter, request *http.Request) {
 
-		logger := GetLogger()
+		logger := utils.GetLogger()
 
 		logger.Info("Executing route", "receiverEndpoint", route.Receiver.Endpoint)
 
 		body := make(map[string]interface{})
 
 		if request.Body != http.NoBody {
-			body, err = LoadBody(request)
+			body, err = utils.LoadBody(request)
 
 			if err != nil {
 				logger.Error(err.Error())
@@ -48,7 +50,7 @@ func CreateRouteHandler(route *RouteConfig, envs *map[string]interface{}) (Route
 			}
 		}
 
-		urlParams, err := LoadUrlParams(request.RequestURI)
+		urlParams, err := utils.LoadUrlParams(request.RequestURI)
 
 		if err != nil {
 			logger.Error(err.Error())
@@ -91,47 +93,47 @@ func CreateRouteHandler(route *RouteConfig, envs *map[string]interface{}) (Route
 	return routeHandler, nil
 }
 
-func CreatePathHandler(receiverConfig *ReceiverConfig, senderConfig *SenderConfig) (PathHandler, error) {
-	bodyTemplate, err := CreateTemplate("bodyTemplate", senderConfig.Body)
+func CreatePathHandler(receiver *Receiver, sender *Sender) (PathHandler, error) {
+	bodyTemplate, err := utils.CreateTemplate("bodyTemplate", sender.Body)
 	if err != nil {
 		return nil, err
 	}
 
 	headerTemplates := make(map[string]*template.Template)
-	for key, value := range senderConfig.Header {
-		template, err := CreateTemplate(key, value)
+	for key, value := range sender.Header {
+		template, err := utils.CreateTemplate(key, value)
 		if err != nil {
 			return nil, err
 		}
 		headerTemplates[key] = template
 	}
 
-	conditionTemplates, err := CreateConditions(senderConfig.Conditions)
+	conditionTemplates, err := CreateConditions(sender.Conditions)
 	if err != nil {
 		return nil, err
 	}
 
-	urlTemplate, err := CreateTemplate("urlTemplate", senderConfig.Endpoint)
+	urlTemplate, err := utils.CreateTemplate("urlTemplate", sender.Endpoint)
 	if err != nil {
 		return nil, err
 	}
 
-	client, err := GetClient(senderConfig.Client)
+	client, err := GetClient(sender.Client)
 	if err != nil {
 		return nil, err
 	}
 
 	pathHandler := func(variables Variables) bool {
-		logger := GetLogger()
+		logger := utils.GetLogger()
 
-		senderBody, err := ExecuteTemplate(bodyTemplate, variables)
+		senderBody, err := utils.ExecuteTemplate(bodyTemplate, variables)
 
 		if err != nil {
 			logger.Error(err.Error())
 			return false
 		}
 
-		senderUrl, err := ExecuteTemplate(urlTemplate, variables)
+		senderUrl, err := utils.ExecuteTemplate(urlTemplate, variables)
 		if err != nil {
 			logger.Error(err.Error())
 			return false
@@ -149,21 +151,21 @@ func CreatePathHandler(receiverConfig *ReceiverConfig, senderConfig *SenderConfi
 			return true
 		}
 
-		req, err := http.NewRequest(senderConfig.Method, senderUrl, bytes.NewReader([]byte(senderBody)))
+		req, err := http.NewRequest(sender.Method, senderUrl, bytes.NewReader([]byte(senderBody)))
 		if err != nil {
 			logger.Error("Could not create request", "error", err.Error())
 			return false
 		}
 
 		for key, tmpl := range headerTemplates {
-			header, err := ExecuteTemplate(tmpl, variables)
+			header, err := utils.ExecuteTemplate(tmpl, variables)
 			if err != nil {
 				logger.Error(err.Error())
 			}
 			req.Header.Add(key, header)
 		}
 
-		logger.Debug("Sending request", "method", senderConfig.Method, "url", senderUrl)
+		logger.Debug("Sending request", "method", sender.Method, "url", senderUrl)
 
 		res, err := client.Do(req)
 		if err != nil {

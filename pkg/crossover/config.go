@@ -1,4 +1,4 @@
-package main
+package crossover
 
 import (
 	"fmt"
@@ -8,35 +8,35 @@ import (
 )
 
 type Config struct {
-	Port                  int           `yaml:"port"`
-	Timeout               int           `yaml:"timeout"`
-	LogLevel              int           `yaml:"logLevel"`
-	Routes                []RouteConfig `yaml:"routes"`
-	EnvironementVariables []string      `yaml:"envs"`
+	Port                  int      `yaml:"port"`
+	Timeout               int      `yaml:"timeout"`
+	LogLevel              int      `yaml:"logLevel"`
+	Routes                []Route  `yaml:"routes"`
+	EnvironementVariables []string `yaml:"envs"`
 }
 
-type RouteConfig struct {
-	Name       string         `yaml:"name"`
-	Receiver   ReceiverConfig `yaml:"receiver"`
-	Sender     []SenderConfig `yaml:"sender"`
-	Conditions []string       `yaml:"conditions"`
+type Route struct {
+	Name       string   `yaml:"name"`
+	Receiver   Receiver `yaml:"receiver"`
+	Sender     []Sender `yaml:"sender"`
+	Conditions []string `yaml:"conditions"`
 }
 
-type ReceiverConfig struct {
+type Receiver struct {
 	Endpoint string `yaml:"endpoint"`
 	Method   string `yaml:"method"`
 }
 
-type SenderConfig struct {
+type Sender struct {
 	Endpoint   string            `yaml:"endpoint"`
 	Method     string            `yaml:"method"`
 	Body       string            `yaml:"body"`
 	Header     map[string]string `yaml:"header"`
-	Client     ClientConfig      `yaml:"client"`
+	Client     Client            `yaml:"client"`
 	Conditions []string          `yaml:"conditions"`
 }
 
-type ClientConfig struct {
+type Client struct {
 	Timeout       int  `yaml:"timeout"`
 	TlsSkipVerify bool `yaml:"tlsSkipVerify"`
 }

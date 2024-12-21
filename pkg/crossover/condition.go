@@ -1,16 +1,18 @@
-package main
+package crossover
 
 import (
 	"fmt"
 	"strconv"
 	"text/template"
+
+	"github.com/LukeTimeWalker/crossover/pkg/utils"
 )
 
 func CreateConditions(conditions []string) ([]*template.Template, error) {
 	conditionTemplates := make([]*template.Template, len(conditions))
 
 	for index, condition := range conditions {
-		template, err := CreateTemplate(fmt.Sprintf("condition[%d]", index), condition)
+		template, err := utils.CreateTemplate(fmt.Sprintf("condition[%d]", index), condition)
 		if err != nil {
 			return nil, err
 		}
@@ -24,12 +26,8 @@ func CreateConditions(conditions []string) ([]*template.Template, error) {
 func EvaluateConditions(conditions []*template.Template, variables Variables) (bool, error) {
 	for _, condition := range conditions {
 		result, err := evaluateCondition(condition, variables)
-		if err != nil {
-			return false, err
-		}
-
-		if !result {
-			return false, nil
+		if err != nil || !result {
+			return result, err
 		}
 	}
 
@@ -37,7 +35,7 @@ func EvaluateConditions(conditions []*template.Template, variables Variables) (b
 }
 
 func evaluateCondition(condition *template.Template, variables Variables) (bool, error) {
-	value, err := ExecuteTemplate(condition, variables)
+	value, err := utils.ExecuteTemplate(condition, variables)
 	if err != nil {
 		return false, err
 	}

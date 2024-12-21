@@ -1,4 +1,4 @@
-package main
+package crossover
 
 import (
 	"crypto/tls"
@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func GetClient(config ClientConfig) (*http.Client, error) {
+func GetClient(config Client) (*http.Client, error) {
 	transportConfig := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: config.TlsSkipVerify},
 	}
