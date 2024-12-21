@@ -1,6 +1,8 @@
-name: Prod Pipeline
+name: Build
 on:
   push:
+    branches:
+      - "*"
 
 jobs:
   compile:
