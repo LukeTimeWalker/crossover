@@ -71,38 +71,11 @@ dockers:
       - "--platform=linux/arm64"
     goos: linux
     goarch: arm64
-  - image_templates:
-      - "luketimewalker/crossover:{{ .Tag }}-darwin-arm64"
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--platform=darwin/arm64"
-    goos: darwin
-    goarch: arm64
-  - image_templates:
-      - "luketimewalker/crossover:{{ .Tag }}-windows-amd64"
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--platform=windows/amd64"
-    goos: windows
-    goarch: amd64
-  - image_templates:
-      - "luketimewalker/crossover:{{ .Tag }}-windows-arm64"
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--platform=windows/arm64"
-    goos: windows
-    goarch: arm64
 docker_manifests:
   - name_template: "luketimewalker/crossover:{{ .Tag }}"
     image_templates:
       - "luketimewalker/crossover:{{ .Tag }}-linux-amd64"
       - "luketimewalker/crossover:{{ .Tag }}-linux-arm64"
-      - "luketimewalker/crossover:{{ .Tag }}-darwin-arm64"
-      - "luketimewalker/crossover:{{ .Tag }}-windows-amd64"
-      - "luketimewalker/crossover:{{ .Tag }}-windows-arm64"
 
 release:
   name_template: "v{{ .Version }}"
