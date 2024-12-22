@@ -5,8 +5,8 @@ before:
     - go mod tidy
 
 builds:
-  main: ./cmd/crossover/main.go
-  - env:
+  - main: ./cmd/crossover/main.go
+    env:
       - CGO_ENABLED=0
     goos:
       - linux

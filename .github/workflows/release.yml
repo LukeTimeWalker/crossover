@@ -3,14 +3,14 @@ name: Release
 on:
   push:
     tags:
-      - "*"
+      - "**"
 
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      # packages: write
+      packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
