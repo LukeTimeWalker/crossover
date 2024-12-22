@@ -56,7 +56,7 @@ changelog:
 
 dockers:
   - image_templates:
-      - "luketimewalker/crossover:{{ .Tag }}-linux-amd64"
+      - "ghcr.io/luketimewalker/crossover:{{ .Tag }}-linux-amd64"
     use: buildx
     build_flag_templates:
       - "--pull"
@@ -64,7 +64,7 @@ dockers:
     goos: linux
     goarch: amd64
   - image_templates:
-      - "luketimewalker/crossover:{{ .Tag }}-linux-arm64"
+      - "ghcr.io/luketimewalker/crossover:{{ .Tag }}-linux-arm64"
     use: buildx
     build_flag_templates:
       - "--pull"
@@ -72,10 +72,10 @@ dockers:
     goos: linux
     goarch: arm64
 docker_manifests:
-  - name_template: "luketimewalker/crossover:{{ .Tag }}"
+  - name_template: "ghcr.io/luketimewalker/crossover:{{ .Tag }}"
     image_templates:
-      - "luketimewalker/crossover:{{ .Tag }}-linux-amd64"
-      - "luketimewalker/crossover:{{ .Tag }}-linux-arm64"
+      - "ghcr.io/luketimewalker/crossover:{{ .Tag }}-linux-amd64"
+      - "ghcr.io/luketimewalker/crossover:{{ .Tag }}-linux-arm64"
 
 release:
   name_template: "v{{ .Version }}"
