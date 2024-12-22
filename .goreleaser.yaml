@@ -15,6 +15,7 @@ builds:
     goarch:
       - amd64
       - arm64
+    binary: crossover
 
 archives:
   - format: tar.gz
