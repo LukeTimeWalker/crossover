@@ -72,14 +72,6 @@ dockers:
     goos: linux
     goarch: arm64
   - image_templates:
-      - "luketimewalker/crossover:{{ .Tag }}-darwin-amd64"
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--platform=darwin/amd64"
-    goos: darwin
-    goarch: amd64
-  - image_templates:
       - "luketimewalker/crossover:{{ .Tag }}-darwin-arm64"
     use: buildx
     build_flag_templates:
@@ -108,7 +100,6 @@ docker_manifests:
     image_templates:
       - "luketimewalker/crossover:{{ .Tag }}-linux-amd64"
       - "luketimewalker/crossover:{{ .Tag }}-linux-arm64"
-      - "luketimewalker/crossover:{{ .Tag }}-darwin-amd64"
       - "luketimewalker/crossover:{{ .Tag }}-darwin-arm64"
       - "luketimewalker/crossover:{{ .Tag }}-windows-amd64"
       - "luketimewalker/crossover:{{ .Tag }}-windows-arm64"
