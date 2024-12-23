@@ -56,26 +56,34 @@ changelog:
 
 dockers:
   - image_templates:
-      - "ghcr.io/luketimewalker/crossover:{{ .Tag }}-linux-amd64"
+      - &amd_image "ghcr.io/luketimewalker/{{.ProjectName}}:{{ .Version }}-amd64"
     use: buildx
     build_flag_templates:
       - "--pull"
       - "--platform=linux/amd64"
-    goos: linux
-    goarch: amd64
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
   - image_templates:
-      - "ghcr.io/luketimewalker/crossover:{{ .Tag }}-linux-arm64"
+      - &arm_image "ghcr.io/luketimewalker/{{.ProjectName}}:{{ .Version }}-arm64"
     use: buildx
     build_flag_templates:
       - "--pull"
       - "--platform=linux/arm64"
-    goos: linux
-    goarch: arm64
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
 docker_manifests:
-  - name_template: "ghcr.io/luketimewalker/crossover:{{ .Tag }}"
+  - name_template: "ghcr.io/luketimewalker/{{.ProjectName}}:{{ .Version }}"
     image_templates:
-      - "ghcr.io/luketimewalker/crossover:{{ .Tag }}-linux-amd64"
-      - "ghcr.io/luketimewalker/crossover:{{ .Tag }}-linux-arm64"
+      - *amd_image
+      - *arm_image
+    name_template: "ghcr.io/luketimewalker/{{.ProjectName}}:latest"
+    image_templates:
+      - *amd_image
+      - *arm_image
 
 release:
   name_template: "v{{ .Version }}"
