@@ -87,6 +87,5 @@ docker_manifests:
 
 release:
   name_template: "v{{ .Version }}"
-  header:
-    from_file:
-      path: ./header.md
+  header: |
+    ![Crossover Logo](./assets/header.svg)
