@@ -2,9 +2,5 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "branchPrefix": "renovate/",
     "dependencyDashboardTitle": "Dependency Dashboard",
-    "gitAuthor": "Renovate <renovate@crossover.com>",
-    "onboarding": true,
-    "onboardingBranch": "renovate/configure",
-    "platform": "github",
-    "repositories": ["LukeTimeWalker/crossover"]
+    "gitAuthor": "Renovate <renovate@crossover.com>"
 }
