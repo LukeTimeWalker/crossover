@@ -80,7 +80,7 @@ docker_manifests:
     image_templates:
       - *amd_image
       - *arm_image
-    name_template: "ghcr.io/luketimewalker/{{.ProjectName}}:latest"
+  - name_template: "ghcr.io/luketimewalker/{{.ProjectName}}:latest"
     image_templates:
       - *amd_image
       - *arm_image
