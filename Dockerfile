@@ -1,5 +1,5 @@
 FROM gcr.io/distroless/static-debian12
 
-COPY crossover /
+COPY target/crossover /
 
 ENTRYPOINT ["/crossover"]
