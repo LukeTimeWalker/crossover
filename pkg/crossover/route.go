@@ -38,20 +38,14 @@ func CreateRouteHandler(route *Route, envs *map[string]interface{}) (RouteHandle
 
 		logger.Info("Executing route", "receiverEndpoint", route.Receiver.Endpoint)
 
-		body := make(map[string]interface{})
-
-		if request.Body != http.NoBody {
-			body, err = utils.LoadBody(request)
-
-			if err != nil {
-				logger.Error(err.Error())
-				writer.WriteHeader(http.StatusBadRequest)
-				return
-			}
+		body, err := utils.LoadBody(request.Body)
+		if err != nil {
+			logger.Error(err.Error())
+			writer.WriteHeader(http.StatusBadRequest)
+			return
 		}
 
 		urlParams, err := utils.LoadUrlParams(request.RequestURI)
-
 		if err != nil {
 			logger.Error(err.Error())
 			writer.WriteHeader(http.StatusBadRequest)
