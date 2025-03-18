@@ -112,7 +112,7 @@ func CreatePathHandler(receiver *Receiver, sender *Sender) (PathHandler, error) 
 		return nil, err
 	}
 
-	client, err := GetClient(sender.Client)
+	client, err := GetClient()
 	if err != nil {
 		return nil, err
 	}
