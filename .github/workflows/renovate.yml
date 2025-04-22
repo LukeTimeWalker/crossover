@@ -15,7 +15,7 @@ jobs:
       - name: Print current user
         run: whoami
       - name: Self-hosted Renovate
-        uses: renovatebot/github-action@v41.0.7
+        uses: renovatebot/github-action@v41.0.21
         with:
           token: ${{ secrets.RENOVATE_TOKEN }}
           configurationFile: ./.github/renovate.global.json
