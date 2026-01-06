@@ -8,12 +8,12 @@ import (
 	"strings"
 )
 
-func LoadBody(requestBody io.ReadCloser) (map[string]interface{}, error) {
+func LoadBody(requestBody io.ReadCloser) (map[string]any, error) {
 	if requestBody == http.NoBody {
 		return nil, nil
 	}
 
-	body := make(map[string]interface{})
+	body := make(map[string]any)
 
 	bytes, err := io.ReadAll(requestBody)
 

@@ -9,7 +9,7 @@ import (
 
 func TestLoadUrlParams(t *testing.T) {
 	u := "https://example.com/?key1=value1&key2=value2&key3=value3"
-	expectedParams := map[string]interface{}{
+	expectedParams := map[string]any{
 		"key1": "value1",
 		"key2": "value2",
 		"key3": "value3",

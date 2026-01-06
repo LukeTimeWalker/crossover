@@ -4,8 +4,8 @@ import (
 	"os"
 )
 
-func LoadEnvs(environmentVariables []string) map[string]interface{} {
-	envs := make(map[string]interface{})
+func LoadEnvs(environmentVariables []string) map[string]any {
+	envs := make(map[string]any)
 	for _, env := range environmentVariables {
 		loadEnv(env, envs)
 	}
@@ -13,7 +13,7 @@ func LoadEnvs(environmentVariables []string) map[string]interface{} {
 	return envs
 }
 
-func loadEnv(name string, vars map[string]interface{}) {
+func loadEnv(name string, vars map[string]any) {
 	logger := GetLogger()
 
 	env, exists := os.LookupEnv(name)

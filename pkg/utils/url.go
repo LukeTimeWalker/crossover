@@ -5,7 +5,7 @@ import (
 	"net/url"
 )
 
-func LoadUrlParams(u string) (map[string]interface{}, error) {
+func LoadUrlParams(u string) (map[string]any, error) {
 	ur, err := url.Parse(u)
 	if err != nil {
 		return nil, fmt.Errorf("could not parse url url=%s error=%s", u, err.Error())
@@ -16,7 +16,7 @@ func LoadUrlParams(u string) (map[string]interface{}, error) {
 		return nil, fmt.Errorf("could not parse url params url=%s error=%s", u, err.Error())
 	}
 
-	urlParams := make(map[string]interface{})
+	urlParams := make(map[string]any)
 	for key, values := range params {
 		if len(values) == 1 {
 			urlParams[key] = values[0]

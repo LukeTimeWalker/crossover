@@ -18,7 +18,7 @@ func main() {
 
 	filepath := "./config.yml"
 
-	flag.StringVar(&filepath, "config", filepath, "path to the configfile")
+	flag.StringVar(&filepath, "config", filepath, "path to the config file")
 
 	flag.Parse()
 
@@ -31,7 +31,7 @@ func main() {
 
 	utils.SetLogLevel(config.LogLevel)
 
-	var envs map[string]interface{}
+	var envs map[string]any
 
 	if config.EnvironementVariables != nil {
 		logger.Info("Reading Environment Variables...")

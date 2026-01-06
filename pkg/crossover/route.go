@@ -8,13 +8,13 @@ import (
 	"github.com/LukeTimeWalker/crossover/pkg/utils"
 )
 
-type Variables map[string]map[string]interface{}
+type Variables map[string]map[string]any
 
 type PathHandler func(variables Variables) bool
 
 type RouteHandler func(writer http.ResponseWriter, request *http.Request)
 
-func CreateRouteHandler(route *Route, envs *map[string]interface{}) (RouteHandler, error) {
+func CreateRouteHandler(route *Route, envs *map[string]any) (RouteHandler, error) {
 
 	pathHandlers := make([]PathHandler, len(route.Sender))
 

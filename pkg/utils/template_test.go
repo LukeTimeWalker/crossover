@@ -31,9 +31,9 @@ func TestCreatingAnInvalidTemplate(t *testing.T) {
 func TestExecutingATemplateWithAllValues(t *testing.T) {
 	template, _ := utils.CreateTemplate("testTemplate", testTemplate)
 	values := crossover.Variables{
-		"env":  map[string]interface{}{"TITLE": "testTitle"},
-		"body": map[string]interface{}{"test": "bodyContent", "array": []string{"1", "2", "3"}},
-		"url":  map[string]interface{}{"url": "param"},
+		"env":  map[string]any{"TITLE": "testTitle"},
+		"body": map[string]any{"test": "bodyContent", "array": []string{"1", "2", "3"}},
+		"url":  map[string]any{"url": "param"},
 	}
 	result, err := utils.ExecuteTemplate(template, values)
 	assert.NoError(t, err)
@@ -48,9 +48,9 @@ func TestExecutingATemplateWithAllValues(t *testing.T) {
 func TestExecutingTemplateWithMissingValues(t *testing.T) {
 	template, _ := utils.CreateTemplate("testTemplate", testTemplate)
 	values := crossover.Variables{
-		"env":  map[string]interface{}{"TITLE": "testTitle"},
-		"body": map[string]interface{}{"test": "bodyContent"},
-		"url":  map[string]interface{}{"url": "param"}}
+		"env":  map[string]any{"TITLE": "testTitle"},
+		"body": map[string]any{"test": "bodyContent"},
+		"url":  map[string]any{"url": "param"}}
 	result, err := utils.ExecuteTemplate(template, values)
 	assert.Error(t, err)
 	assert.Empty(t, result)

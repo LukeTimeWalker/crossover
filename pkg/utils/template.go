@@ -16,7 +16,7 @@ func CreateTemplate(name string, templateText string) (*template.Template, error
 	return tmpl, nil
 }
 
-func ExecuteTemplate(tmpl *template.Template, values interface{}) (string, error) {
+func ExecuteTemplate(tmpl *template.Template, values any) (string, error) {
 	var output bytes.Buffer
 
 	err := tmpl.Execute(&output, values)
