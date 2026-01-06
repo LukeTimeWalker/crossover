@@ -1,5 +1,4 @@
-coverage.out
-payload.json
-.vscode/
+.vscode/**/*
+.task/**/*
+target/**/*
 config.yml
-target/

@@ -1,5 +1,9 @@
-FROM gcr.io/distroless/static-debian12
+FROM gcr.io/distroless/static-debian13
 
-COPY target/crossover /
+ARG TARGETOS
+ARG TARGETARCH
+ARG PROJECT_VERSION
+
+COPY target/crossover-${PROJECT_VERSION}-${TARGETOS}-${TARGETARCH} /crossover
 
 ENTRYPOINT ["/crossover"]
