@@ -8,7 +8,7 @@ import (
 	"path"
 	"time"
 
-	"github.com/LukeTimeWalker/crossover/pkg/crossover"
+	"github.com/LukeTimeWalker/crossover/pkg/core"
 	"github.com/LukeTimeWalker/crossover/pkg/utils"
 )
 
@@ -22,7 +22,7 @@ func main() {
 
 	flag.Parse()
 
-	config, err := crossover.GetConfig(filepath)
+	config, err := core.GetConfig(filepath)
 
 	if err != nil {
 		logger.Error(err.Error(), "filepath", filepath)
@@ -43,7 +43,7 @@ func main() {
 	for _, route := range config.Routes {
 		logger.Info("Registering Route", "name", route.Name, "method", route.Receiver.Method, "route", route.Receiver.Endpoint)
 
-		routeHandler, err := crossover.CreateRouteHandler(&route, &envs)
+		routeHandler, err := core.CreateRouteHandler(&route, &envs)
 
 		if err != nil {
 			logger.Error(err.Error())

@@ -3,7 +3,7 @@ package utils_test
 import (
 	"testing"
 
-	"github.com/LukeTimeWalker/crossover/pkg/crossover"
+	"github.com/LukeTimeWalker/crossover/pkg/core"
 	"github.com/LukeTimeWalker/crossover/pkg/utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -30,7 +30,7 @@ func TestCreatingAnInvalidTemplate(t *testing.T) {
 
 func TestExecutingATemplateWithAllValues(t *testing.T) {
 	template, _ := utils.CreateTemplate("testTemplate", testTemplate)
-	values := crossover.Variables{
+	values := core.Variables{
 		"env":  map[string]any{"TITLE": "testTitle"},
 		"body": map[string]any{"test": "bodyContent", "array": []string{"1", "2", "3"}},
 		"url":  map[string]any{"url": "param"},
@@ -47,7 +47,7 @@ func TestExecutingATemplateWithAllValues(t *testing.T) {
 
 func TestExecutingTemplateWithMissingValues(t *testing.T) {
 	template, _ := utils.CreateTemplate("testTemplate", testTemplate)
-	values := crossover.Variables{
+	values := core.Variables{
 		"env":  map[string]any{"TITLE": "testTitle"},
 		"body": map[string]any{"test": "bodyContent"},
 		"url":  map[string]any{"url": "param"}}

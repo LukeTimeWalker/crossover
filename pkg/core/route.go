@@ -1,4 +1,4 @@
-package crossover
+package core
 
 import (
 	"bytes"
