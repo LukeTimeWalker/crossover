@@ -16,7 +16,7 @@ func main() {
 
 	logger := utils.GetLogger()
 
-	filepath := "./config.yml"
+	filepath := "./config.yaml"
 
 	flag.StringVar(&filepath, "config", filepath, "path to the config file")
 

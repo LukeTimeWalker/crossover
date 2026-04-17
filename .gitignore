@@ -1,4 +1,4 @@
 .vscode/**/*
 .task/**/*
 target/**/*
-config.yml
+config.yaml

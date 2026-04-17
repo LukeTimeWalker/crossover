@@ -14,18 +14,18 @@ To install crossover, you can either download the binary or use the docker image
 
 ## Usage
 
-Crossover can be configured via a `config.yml` file, which can be specified via the `-config` flag. If no config file is specified, the system searches for `./config.yml` in the same directory as crossover by default.
+Crossover can be configured via a `config.yaml` file, which can be specified via the `-config` flag. If no config file is specified, the system searches for `./config.yaml` in the same directory as crossover by default.
 
 ### Binary
 
 ```bash
-./crossover -config "./config.yml"
+./crossover -config "./config.yaml"
 ```
 
 ### Docker/Podman
 
 ```bash
-docker run -v ./config.yml:/crossover/config.yml -p 9999:9999 crossover
+docker run -v ./config.yaml:/crossover/config.yaml -p 9999:9999 crossover
 ```
 
 ## Config
@@ -40,7 +40,6 @@ docker run -v ./config.yml:/crossover/config.yml -p 9999:9999 crossover
 | `routes[x].receiver` | Defines the config for the receiving endpoint of a route | |
 | `routes[x].receiver.endpoint` | Defines the endpoint the receiver should listen at | |
 | `routes[x].receiver.method` | Defines the HTTP method for the receiver | |
-
 
 
 The following config configures crossover to handle a route that opens a new GitLab Issue every time it receives a request on the /gitlab endpoint.
@@ -61,7 +60,7 @@ routes: # list of routes that crossover should handle
         method: POST # HTTP method
         header:
           Content-Type: application/json
-          Authorization: "Bearer {{ env.TOKEN }}"
+          Authorization: "Bearer {{ .env.TOKEN }}"
         body: |
           {
             "title": "[Grafana Alert] {{ .body.title }}",
