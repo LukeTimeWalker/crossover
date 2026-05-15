@@ -9,7 +9,6 @@ import (
 
 type Config struct {
 	Port                  int      `yaml:"port"`
-	Timeout               int      `yaml:"timeout"`
 	LogLevel              int      `yaml:"logLevel"`
 	Routes                []Route  `yaml:"routes"`
 	EnvironementVariables []string `yaml:"envs"`
@@ -37,20 +36,40 @@ type Sender struct {
 }
 
 type Client struct {
-	Timeout       int  `yaml:"timeout"`
-	TlsSkipVerify bool `yaml:"tlsSkipVerify"`
+	Timeout       string `yaml:"timeout"`
+	TlsSkipVerify bool   `yaml:"tlsSkipVerify"`
 }
 
-func DefaultConfig() *Config {
-	return &Config{
-		Port:     9999,
-		Timeout:  10,
-		LogLevel: 1,
+func (s *Sender) withDefaults() {
+	s.Client.withDefaults()
+}
+
+func (r *Route) withDefaults() {
+	for i := range r.Sender {
+		r.Sender[i].withDefaults()
+	}
+}
+
+func (c *Config) withDefaults() {
+	if c.Port == 0 {
+		c.Port = 9999
+	}
+	if c.LogLevel == 0 {
+		c.LogLevel = 1
+	}
+	for i := range c.Routes {
+		c.Routes[i].withDefaults()
+	}
+}
+
+func (c *Client) withDefaults() {
+	if c.Timeout == "" {
+		c.Timeout = "10s"
 	}
 }
 
 func GetConfig(filepath string) (*Config, error) {
-	config := DefaultConfig()
+	config := &Config{}
 
 	file, err := os.ReadFile(filepath)
 	if err != nil {
@@ -61,6 +80,8 @@ func GetConfig(filepath string) (*Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshaling config file error=%s", err.Error())
 	}
+
+	config.withDefaults()
 
 	return config, nil
 }

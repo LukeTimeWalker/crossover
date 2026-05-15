@@ -6,22 +6,34 @@ import (
 	"time"
 )
 
-// func GetClient(config Client) (*http.Client, error) {
-// 	transportConfig := &http.Transport{
-// 		TLSClientConfig: &tls.Config{InsecureSkipVerify: config.TlsSkipVerify},
-// 	}
+var clients map[*Sender]*http.Client
 
-// 	client := &http.Client{Transport: transportConfig, Timeout: time.Duration(config.Timeout) * time.Second}
+func InitializeClients(length int) {
+	if clients == nil {
+		clients = make(map[*Sender]*http.Client, length)
+	}
+}
 
-// 	return client, nil
-// }
-
-func GetClient() (*http.Client, error) {
-	transportConfig := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+func GetClient(sender *Sender) (*http.Client, error) {
+	if client, ok := clients[sender]; ok {
+		return client, nil
 	}
 
-	client := &http.Client{Transport: transportConfig, Timeout: time.Duration(10) * time.Second}
+	transportConfig := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: sender.Client.TlsSkipVerify},
+	}
+
+	timeout, err := time.ParseDuration(sender.Client.Timeout)
+	if err != nil {
+		return nil, err
+	}
+
+	client := &http.Client{
+		Transport: transportConfig,
+		Timeout:   timeout,
+	}
+
+	clients[sender] = client
 
 	return client, nil
 }

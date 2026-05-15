@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"time"
 
 	"github.com/LukeTimeWalker/crossover/pkg/core"
 	"github.com/LukeTimeWalker/crossover/pkg/utils"
@@ -40,6 +39,8 @@ func main() {
 
 	router := http.NewServeMux()
 
+	core.InitializeClients(getNumberOfSenders(config.Routes))
+
 	for _, route := range config.Routes {
 		logger.Info("Registering Route", "name", route.Name, "method", route.Receiver.Method, "route", route.Receiver.Endpoint)
 
@@ -58,11 +59,17 @@ func main() {
 	logger.Info("Starting Crossover Server...")
 
 	server := &http.Server{
-		Handler:      router,
-		Addr:         fmt.Sprintf(":%d", config.Port),
-		WriteTimeout: time.Duration(config.Timeout) * time.Second,
-		ReadTimeout:  time.Duration(config.Timeout) * time.Second,
+		Handler: router,
+		Addr:    fmt.Sprintf(":%d", config.Port),
 	}
 
 	panic(server.ListenAndServe())
+}
+
+func getNumberOfSenders(routes []core.Route) int {
+	numberOfSender := 0
+	for i := range routes {
+		numberOfSender += len(routes[i].Sender)
+	}
+	return numberOfSender
 }

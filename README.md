@@ -30,23 +30,21 @@ docker run -v ./config.yaml:/crossover/config.yaml -p 9999:9999 crossover
 
 ## Config
 
-| Key | Description | Default |
-| --- | ----------- | ------- |
-| `port` | Port lets you specify on which port the crossover server should listen | 9999 |
-| `timeout` | Specifies the timeout for outgoing HTTP Requests in seconds | 10 |
-| `logLevel` | Sets the log level (0 = ERROR, 1 = WARN, 2 = INFO, 3 = DEBUG) | 1 |
-| `routes` | Defines an array of routes | |
-| `routes[x].name` | Defines the name of the route. The name is used in log messages | |
-| `routes[x].receiver` | Defines the config for the receiving endpoint of a route | |
-| `routes[x].receiver.endpoint` | Defines the endpoint the receiver should listen at | |
-| `routes[x].receiver.method` | Defines the HTTP method for the receiver | |
+| Key                           | Description                                                            | Default |
+|-------------------------------|------------------------------------------------------------------------|---------|
+| `port`                        | Port lets you specify on which port the crossover server should listen | 9999    |
+| `logLevel`                    | Sets the log level (0 = ERROR, 1 = WARN, 2 = INFO, 3 = DEBUG)          | 1       |
+| `routes`                      | Defines an array of routes                                             |         |
+| `routes[x].name`              | Defines the name of the route. The name is used in log messages        |         |
+| `routes[x].receiver`          | Defines the config for the receiving endpoint of a route               |         |
+| `routes[x].receiver.endpoint` | Defines the endpoint the receiver should listen at                     |         |
+| `routes[x].receiver.method`   | Defines the HTTP method for the receiver                               |         |
 
 
 The following config configures crossover to handle a route that opens a new GitLab Issue every time it receives a request on the /gitlab endpoint.
 
 ```yaml
 port: 9999 # port on which crossover listens
-timeout: 15 # timeout in seconds
 logLevel: 3 # log level
 envs: # list of environment variable names that should be used for templating
   - TOKEN
