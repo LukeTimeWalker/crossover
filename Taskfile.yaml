@@ -1,3 +1,4 @@
+---
 version: "3"
 
 vars:
@@ -41,7 +42,7 @@ tasks:
       vars:
         - PROJECT_VERSION
     cmds:
-      - podman build 
+      - podman build
           --platform {{.OS}}/{{.ARCH}}
           --build-arg PROJECT_VERSION={{.PROJECT_VERSION}}
           --label "org.opencontainers.image.created={{now}}"
