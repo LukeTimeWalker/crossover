@@ -4,6 +4,7 @@ import (
 	"os"
 )
 
+// Loads a list of defined Environment Variables
 func LoadEnvs(environmentVariables []string) map[string]any {
 	envs := make(map[string]any)
 	for _, env := range environmentVariables {
@@ -18,14 +19,15 @@ func loadEnv(name string, vars map[string]any) {
 
 	env, exists := os.LookupEnv(name)
 
-	if exists {
-		if env == "" {
-			logger.Warn("Environment variable is empty", "variable", name)
-		} else {
-			logger.Debug("Environment variable found", "variable", name)
-		}
-		vars[name] = env
-	} else {
+	if !exists {
 		logger.Warn("Environment variable not found", "variable", name)
+		return
 	}
+
+	if env == "" {
+		logger.Warn("Environment variable is empty", "variable", name)
+	} else {
+		logger.Debug("Environment variable found", "variable", name)
+	}
+	vars[name] = env
 }
