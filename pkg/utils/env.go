@@ -6,7 +6,7 @@ import (
 
 // Loads a list of defined Environment Variables
 func LoadEnvs(environmentVariables []string) map[string]any {
-	envs := make(map[string]any)
+	envs := make(map[string]any, len(environmentVariables))
 	for _, env := range environmentVariables {
 		loadEnv(env, envs)
 	}
