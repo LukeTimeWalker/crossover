@@ -1,9 +1,7 @@
 ---
 name: Renovate
-
 on:
   workflow_dispatch:
-
 jobs:
   renovate:
     name: Renovate

@@ -1,10 +1,8 @@
 ---
 version: 2
-
 before:
   hooks:
     - go mod tidy
-
 builds:
   - main: ./cmd/crossover/main.go
     env:
@@ -17,20 +15,13 @@ builds:
       - amd64
       - arm64
     binary: target/crossover
-
 archives:
   - format: tar.gz
     name_template: >-
-      {{ .ProjectName }}_
-      {{ .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "386" }}i386
-      {{- else }}{{ .Arch }}{{ end }}
-      {{- if .Arm }}v{{ .Arm }}{{ end }}
+      {{ .ProjectName }}_ {{ .Os }}_ {{- if eq .Arch "amd64" }}x86_64 {{- else if eq .Arch "386" }}i386 {{- else }}{{ .Arch }}{{ end }} {{- if .Arm }}v{{ .Arm }}{{ end }}
     format_overrides:
       - goos: windows
         format: zip
-
 changelog:
   sort: asc
   filters:
@@ -44,17 +35,16 @@ changelog:
       - "Merge branch"
   groups:
     - title: "New Features"
-      regexp: '^.*?feat(\(.+\))??!?:.+$'
+      regexp: "^.*?feat(\\(.+\\))??!?:.+$"
       order: 100
     - title: "Bug fixes"
-      regexp: '^.*?(fix|refactor)(\(.+\))??!?:.+$'
+      regexp: "^.*?(fix|refactor)(\\(.+\\))??!?:.+$"
       order: 200
     - title: Dependency updates
-      regexp: '^.*?(.+)\(deps\)!?:.+$'
+      regexp: "^.*?(.+)\\(deps\\)!?:.+$"
       order: 300
     - title: Other work
       order: 9999
-
 dockers:
   - image_templates:
       - &amd_image "ghcr.io/luketimewalker/{{.ProjectName}}:{{ .Version }}-amd64"
@@ -85,8 +75,7 @@ docker_manifests:
     image_templates:
       - *amd_image
       - *arm_image
-
 release:
   name_template: "v{{ .Version }}"
-  header: |
+  header: |-
     ![Crossover Logo](./assets/header.svg)
