@@ -8,13 +8,11 @@ import (
 
 var clients map[*Sender]*http.Client
 
-func InitializeClients(length int) {
-	if clients == nil {
-		clients = make(map[*Sender]*http.Client, length)
-	}
-}
-
 func GetClient(sender *Sender) (*http.Client, error) {
+	if clients == nil {
+		clients = make(map[*Sender]*http.Client)
+	}
+
 	if client, ok := clients[sender]; ok {
 		return client, nil
 	}
