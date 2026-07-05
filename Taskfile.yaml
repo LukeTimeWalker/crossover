@@ -1,23 +1,28 @@
 ---
 version: "3"
+
 vars:
   PROJECT_NAME: "crossover"
   OS: "linux"
   ARCH: "amd64"
+
 tasks:
   default:
     desc: Shows this list of tasks
     cmds:
       - task --list
     silent: true
+
   go:test:
     desc: Runs the Tests
     cmds:
       - go test ./...
+
   go:run:
     desc: Runs Crossover locally
     cmds:
       - go run ./cmd/crossover/main.go
+
   go:build:
     desc: Build the Go binary
     requires:
@@ -30,13 +35,23 @@ tasks:
       - "**/*.go"
     generates:
       - "./target/{{.PROJECT_NAME}}-{{.PROJECT_VERSION}}-{{.OS}}-{{.ARCH}}"
+
   image:build:
     desc: Builds a Container Image using Podman
     requires:
       vars:
         - PROJECT_VERSION
     cmds:
-      - podman build --platform {{.OS}}/{{.ARCH}} --build-arg PROJECT_VERSION={{.PROJECT_VERSION}} --label "org.opencontainers.image.created={{now}}" --label "org.opencontainers.image.authors=Lukas Zeitler <lukas.zeitler@etik.com>" --label "org.opencontainers.image.source=https://github.com/LukeTimeWalker/crossover" --label "org.opencontainers.image.version={{.PROJECT_VERSION}}" --label "org.opencontainers.image.licenses=MIT" --label "org.opencontainers.image.title={{.PROJECT_NAME | title}} {{.PROJECT_VERSION}}" -t localhost/{{.PROJECT_NAME}}:{{.PROJECT_VERSION}} .
+      - podman build
+          --platform {{.OS}}/{{.ARCH}}
+          --build-arg PROJECT_VERSION={{.PROJECT_VERSION}}
+          --label "org.opencontainers.image.created={{now}}"
+          --label "org.opencontainers.image.authors=Lukas Zeitler <lukas.zeitler@etik.com>"
+          --label "org.opencontainers.image.source=https://github.com/LukeTimeWalker/crossover"
+          --label "org.opencontainers.image.version={{.PROJECT_VERSION}}"
+          --label "org.opencontainers.image.licenses=MIT"
+          --label "org.opencontainers.image.title={{.PROJECT_NAME | title}} {{.PROJECT_VERSION}}"
+          -t localhost/{{.PROJECT_NAME}}:{{.PROJECT_VERSION}} .
     sources:
       - "Dockerfile"
       - "{{.PROJECT_NAME}}-{{.PROJECT_VERSION}}-{{.OS}}-{{.ARCH}}"
