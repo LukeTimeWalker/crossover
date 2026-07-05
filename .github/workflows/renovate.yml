@@ -8,11 +8,11 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Print current user
         run: whoami
       - name: Self-hosted Renovate
-        uses: renovatebot/github-action@v41.0.7
+        uses: renovatebot/github-action@v46
         with:
           token: ${{ secrets.RENOVATE_TOKEN }}
           configurationFile: ./.github/renovate.global.json
