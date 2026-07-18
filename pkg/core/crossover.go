@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"sync"
 
 	"github.com/LukeTimeWalker/crossover/pkg/utils"
 )
@@ -14,6 +15,8 @@ type Crossover struct {
 	logger *slog.Logger
 	router *http.ServeMux
 	server *http.Server
+	mu     sync.RWMutex
+	handlers map[string]RouteHandler
 }
 
 func NewCrossover(config *Config) *Crossover {
@@ -34,10 +37,13 @@ func NewCrossover(config *Config) *Crossover {
 		Addr:    fmt.Sprintf(":%d", config.Port),
 	}
 
-	crossover := Crossover{logger: logger, router: router, server: server}
+	crossover := Crossover{logger: logger, router: router, server: server, handlers: make(map[string]RouteHandler)}
 
 	for _, route := range config.Routes {
-		crossover.RegisterRoute(route, envs)
+		if err := crossover.RegisterRoute(route, envs); err != nil {
+			logger.Error(err.Error())
+			os.Exit(1)
+		}
 	}
 
 	return &crossover
@@ -56,26 +62,53 @@ func (c *Crossover) Stop() {
 func (c *Crossover) UnregisterRoute(route Route) {
 	c.logger.Info("Unregistering Route", "name", route.Name, "method", route.Receiver.Method, "route", route.Receiver.Endpoint)
 
-	receiverEndpoint := path.Clean(fmt.Sprintf("/%s", route.Receiver.Endpoint))
+	pattern := routePattern(route)
 
-	c.router.HandleFunc(fmt.Sprintf("%s %s", route.Receiver.Method, receiverEndpoint), func(w http.ResponseWriter, r *http.Request) {
-		http.NotFound(w, r)
-	})
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if _, exists := c.handlers[pattern]; exists {
+		c.handlers[pattern] = nil
+	}
 }
 
-func (c *Crossover) RegisterRoute(route Route, envs map[string]any) {
+func (c *Crossover) RegisterRoute(route Route, envs map[string]any) error {
 	c.logger.Info("Registering Route", "name", route.Name, "method", route.Receiver.Method, "route", route.Receiver.Endpoint)
 
 	routeHandler, err := CreateRouteHandler(&route, &envs)
 
 	if err != nil {
-		c.logger.Error(err.Error())
-		os.Exit(1)
+		return err
 	}
 
-	receiverEndpoint := path.Clean(fmt.Sprintf("/%s", route.Receiver.Endpoint))
+	pattern := routePattern(route)
 
-	c.router.HandleFunc(fmt.Sprintf("%s %s", route.Receiver.Method, receiverEndpoint), routeHandler)
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if _, exists := c.handlers[pattern]; !exists {
+		c.router.HandleFunc(pattern, func(writer http.ResponseWriter, request *http.Request) {
+			c.mu.RLock()
+			handler := c.handlers[pattern]
+			c.mu.RUnlock()
+
+			if handler == nil {
+				http.NotFound(writer, request)
+				return
+			}
+
+			handler(writer, request)
+		})
+	}
+
+	c.handlers[pattern] = routeHandler
+
+	return nil
+}
+
+func routePattern(route Route) string {
+	receiverEndpoint := path.Clean(fmt.Sprintf("/%s", route.Receiver.Endpoint))
+	return fmt.Sprintf("%s %s", route.Receiver.Method, receiverEndpoint)
 }
 
 func (c *Crossover) Router() *http.ServeMux {
