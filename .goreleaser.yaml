@@ -14,12 +14,12 @@ builds:
     goarch:
       - amd64
       - arm64
-    binary: target/crossover
+    binary: crossover
 archives:
   - formats:
       - tar.gz
     name_template: >-
-      {{ .ProjectName }}_ {{ .Os }}_ {{- if eq .Arch "amd64" }}x86_64 {{- else if eq .Arch "386" }}i386 {{- else }}{{ .Arch }}{{ end }} {{- if .Arm }}v{{ .Arm }}{{ end }}
+      {{ .ProjectName }}_{{ .Os }}_{{- if eq .Arch "amd64" }}x86_64{{- else }}{{ .Arch }}{{ end }}{{- if .Arm }}v{{ .Arm }}{{ end }}
     format_overrides:
       - goos: windows
         formats:
@@ -56,8 +56,6 @@ dockers_v2:
     platforms:
       - linux/amd64
       - linux/arm64
-    build_args:
-      PROJECT_VERSION: "{{ .Version }}"
     flags:
       - --pull
     annotations:
@@ -72,4 +70,5 @@ dockers_v2:
 release:
   name_template: "v{{ .Version }}"
   header: |-
-    ![Crossover Logo](./assets/header.svg)
+    ![Crossover Logo](./assets/header_dark.svg#gh-dark-mode-only)
+    ![Crossover Logo](./assets/header_light.svg#gh-light-mode-only)
