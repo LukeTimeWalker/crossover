@@ -16,12 +16,14 @@ builds:
       - arm64
     binary: target/crossover
 archives:
-  - format: tar.gz
+  - formats:
+      - tar.gz
     name_template: >-
       {{ .ProjectName }}_ {{ .Os }}_ {{- if eq .Arch "amd64" }}x86_64 {{- else if eq .Arch "386" }}i386 {{- else }}{{ .Arch }}{{ end }} {{- if .Arm }}v{{ .Arm }}{{ end }}
     format_overrides:
       - goos: windows
-        format: zip
+        formats:
+          - zip
 changelog:
   sort: asc
   filters:
@@ -45,36 +47,28 @@ changelog:
       order: 300
     - title: Other work
       order: 9999
-dockers:
-  - image_templates:
-      - &amd_image "ghcr.io/luketimewalker/{{.ProjectName}}:{{ .Version }}-amd64"
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/amd64"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-  - image_templates:
-      - &arm_image "ghcr.io/luketimewalker/{{.ProjectName}}:{{ .Version }}-arm64"
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/arm64"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-docker_manifests:
-  - name_template: "ghcr.io/luketimewalker/{{.ProjectName}}:{{ .Version }}"
-    image_templates:
-      - *amd_image
-      - *arm_image
-  - name_template: "ghcr.io/luketimewalker/{{.ProjectName}}:latest"
-    image_templates:
-      - *amd_image
-      - *arm_image
+dockers_v2:
+  - images:
+      - ghcr.io/luketimewalker/{{ .ProjectName }}
+    tags:
+      - "{{ .Version }}"
+      - latest
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    build_args:
+      PROJECT_VERSION: "{{ .Version }}"
+    flags:
+      - --pull
+    annotations:
+      org.opencontainers.image.name: "{{.ProjectName}}"
+      org.opencontainers.image.description: "Lightweight, declarative webhook translator written in Go"
+      org.opencontainers.image.created: "{{ .Date }}"
+      org.opencontainers.image.revision: "{{ .FullCommit }}"
+      org.opencontainers.image.version: "{{ .Version }}"
+      org.opencontainers.image.source: "{{.GitURL}}"
+      org.opencontainers.image.base.name: "{{.BaseImage}}"
+      org.opencontainers.image.base.digest: "{{.BaseImageDigest}}"
 release:
   name_template: "v{{ .Version }}"
   header: |-
