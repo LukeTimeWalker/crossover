@@ -70,5 +70,4 @@ dockers_v2:
 release:
   name_template: "v{{ .Version }}"
   header: |-
-    ![Crossover Logo](./assets/header_dark.svg#gh-dark-mode-only)
-    ![Crossover Logo](./assets/header_light.svg#gh-light-mode-only)
+    ![Crossover Logo](./assets/header.svg)
