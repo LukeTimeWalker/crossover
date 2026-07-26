@@ -40,7 +40,7 @@ Crossover can be configured via a `config.yaml` file, which can be specified wit
 ### Docker/Podman
 
 ```bash
-docker run -v ./config.yaml:/crossover/config.yaml -p 9999:9999 ghcr.io/luketimewalker/crossover:latest
+docker run -v ./config.yaml:/config.yaml -p 9999:9999 ghcr.io/luketimewalker/crossover:latest
 ```
 
 ## Config
