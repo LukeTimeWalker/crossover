@@ -1,3 +1,25 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json"
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigestsToSemver",
+    "docker:pinDigests"
+  ],
+  "packageRules": [
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions"
+    },
+    {
+      "matchManagers": ["gomod"],
+      "groupName": "Go Dependencies"
+    },
+    {
+      "matchManagers": ["dockerfile"],
+      "groupName": "Docker Base Image"
+    }
+  ],
+  "lockFileMaintenance": {
+    "enabled": true
+  }
 }
