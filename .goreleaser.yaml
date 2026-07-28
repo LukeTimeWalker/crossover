@@ -58,8 +58,6 @@ dockers_v2:
       - linux/arm64
     flags:
       - --pull
-      - --provenance=false
-      - --sbom=false
     annotations:
       org.opencontainers.image.name: "{{.ProjectName}}"
       org.opencontainers.image.description: "Lightweight, declarative webhook translator written in Go"
